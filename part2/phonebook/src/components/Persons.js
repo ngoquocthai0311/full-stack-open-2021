@@ -1,30 +1,24 @@
 import React from "react";
 
-const Persons = ({text , persons}) => {
+const Persons = ({persons, filter, deletePerson}) => {
     const isFilterApplied = () => {
-        const lowerCaseText = text.toLowerCase()
-        console.log(lowerCaseText)
-        if (text === '') {
+      if (filter === '') {
+        if (persons.length !== 0) {
           return (
             <ul>
-              {persons.map((person, index) => <li key={index}>{person.name} {person.phone}</li>)}
+              {persons.map((person, index) => <li key={index}>{person.name} {person.number} <button onClick={() => deletePerson(person)}>delete</button></li>)}
             </ul>
           )
-        } else {
-            return (
-                <ul>
-                  {persons.map((person, index) => {
-                    
-                    if (person.name.toLowerCase().includes(text) || person.phone.includes(text)) 
-                      return (
-                        <li key={index}>{person.name} {person.phone}</li>
-                      )
-                  })}
-                </ul>
-              )
-        }   
+        }
+      } else {
+        const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(filter))
+        return (
+          <ul>
+            {filteredPersons.map((person, index) => <li key={index}>{person.name} {person.number} <button onClick={() => deletePerson(person)}>delete</button></li>)}
+          </ul>
+        )
+      }
     }
-
     return(
         <div>
             {isFilterApplied()}

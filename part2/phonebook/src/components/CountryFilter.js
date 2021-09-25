@@ -1,7 +1,8 @@
 import React from "react";
 import Country from "./Country";
 
-const Filter = ({countries, getCountryFromApi})  => {
+const CountryFilter = ({countries, getCountriesFromAPI})  => {
+    
     
 
     const render = () => {
@@ -29,7 +30,7 @@ const Filter = ({countries, getCountryFromApi})  => {
                         <ul>
                             {countries.map((item, index) => 
                                 <li key={index}>{item.name} <button onClick={() => {
-                                    getCountryFromApi(item.name)
+                                    getCountriesFromAPI(item.name)
                                 }}>show</button> </li>
                             )}
                         </ul>
@@ -45,4 +46,4 @@ const Filter = ({countries, getCountryFromApi})  => {
     )
 }
 
-export default Filter
+export default CountryFilter

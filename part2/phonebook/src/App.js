@@ -1,66 +1,161 @@
-import React, { useState } from 'react'
-import Filter from './components/Filter'
-import PersonalForm from './components/PersonalForm'
+import React, { useEffect, useState } from 'react'
+import CountryFilter from './components/CountryFilter'
+import NameFilter from './components/NameFilter'
 import Persons from './components/Persons'
+import PersonalForm from './components/PersonalForm'
+import Notification from './components/Notification'
+import personServices from './services/persons'
+import countryServices from './services/countries';
 
 const App = () => {
-  const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas', phone: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
-  ]) 
-  
+  const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newPhone, setNewPhone ] = useState('')
   const [ filter, setFilter ] = useState('')
+  const [ country, setCountry ] = useState('')
+  const [ countries, setCountries ] = useState([])
+  const [ notificationMessage, setNotificationMessage ] = useState('')
+  const [ error, setError] = useState(false)
 
-  const handleNewNameChange = (event) => {
-    setNewName(event.target.value)
+  const setTimeOutForNotification = () => {
+    const timeOutForNotificationMessage = 5000
+    setTimeout(() => { setNotificationMessage('')}, timeOutForNotificationMessage)
   }
 
-  const handleNewPhoneChange = (event) => {
-    setNewPhone(event.target.value)
+  useEffect(() => {
+    personServices.getPersons()
+      .then(data => {
+        setPersons(data)
+      })
+  }, [])
+
+
+  const getCountriesFromApi = (name) => {
+    countryServices.getCountries(name)
+      .then(data => {
+        setCountries(data)
+      })
+      .catch(error => {
+        console.log("something is wrong")
+      })
   }
 
-  const handleNewFilter = (event) => {
-    setFilter(event.target.value)
-  }
+  const handleCountryChange = (event) => {
+    const newCountry = event.target.value
+    setCountry(newCountry)
 
+    if (newCountry !== '') {
+      getCountriesFromApi(newCountry)
+    }
+  }  
 
   const addNewPerson = (event) => {
     event.preventDefault()
-    const newpPerson = { // create an object name to add into array
-      name: newName,
-      phone: newPhone
-    }
 
-    if (!persons.find(person => person.name === newpPerson.name)) {
-      setPersons(persons.concat(newpPerson))
+    // find duplicate
+    const duplicatedPerson = persons.find(person => person.name === newName)
+
+    if (!duplicatedPerson) { // there is no duplicate 
+      // create new person object
+      const newPerson = {
+        name: newName,
+        number: newPhone
+      }
+      // post request to add new person into db.json
+      personServices.create(newPerson)
+        .then(data => {
+          // update new states 
+          setPersons(persons.concat(data))
+
+          // update notification 
+          setError(false)
+          setNotificationMessage(`Added ${data.name}`)
+          // set time out to delete notification 
+          setTimeOutForNotification()
+        })
+        .catch(error => {
+          console.log(error)
+        })
     } else {
-      alert(newpPerson.name + " is already added to phonebook")
-    }
+      // update phone number of existed person in the phone book
+      const isReplace = window.confirm(duplicatedPerson.name + ' is already added to the phone book, replace the old number with a new one ? ')
 
+      if (isReplace) {
+        // update new phone for new person
+        const updatedPerson = {...duplicatedPerson, number: newPhone} 
+
+        // put request to update current person
+        personServices.updatePerson(updatedPerson.id, updatedPerson)
+          .then(data => {
+            switch(data.status) {
+              case 200: {
+                setPersons(persons.map(person => person.name !== updatedPerson.name ? person : updatedPerson))
+                // update notification 
+                setError(false)
+                setNotificationMessage(`Phone number of ${updatedPerson.name} is changed`)
+
+                setTimeOutForNotification()
+                break
+              }
+              default: {}
+            }
+          })
+          .catch(error => {
+            setError(true)
+            setNotificationMessage(`Information of ${updatedPerson.name} has already been removed from the server`)
+            setTimeOutForNotification()
+            // update state 
+            personServices.getPersons()
+              .then(data => setPersons(data))
+          })
+      }
+    } 
+
+    // reset state 
     setNewName('')
+    setNewPhone('')
+  }
+
+  // handle delete a person from db.json
+  const handleDeletePerson = deletedPerson => {
+    const isDelete = window.confirm("Delete " + deletedPerson.name + " ?")
+    
+    if (isDelete) {
+      personServices.deletePerson(deletedPerson.id)
+        .then(response => {
+          // filter deleted person => return new array 
+          const filteredPersons = persons.filter(person => person.name !== deletedPerson.name)
+
+          // update states 
+          setPersons(filteredPersons)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    }
   }
 
   return (
     <div>
+      find country <input value={country} onChange={handleCountryChange}/>
+
+      <CountryFilter countries={countries} getCountriesFromAPI={getCountriesFromApi}/>
+
       <h2>Phonebook</h2>
 
-      <Filter state={filter} setState={handleNewFilter}/>
+      <Notification notificationMessage={notificationMessage} isError={error}/>
+
+      <NameFilter state={filter} setState={setFilter}/>
 
       <h2>add a new</h2>
       
       <PersonalForm 
         name={newName} phone={newPhone} 
-        setStateName={handleNewNameChange} setStatePhone={handleNewPhoneChange}
+        setStateName={setNewName} setStatePhone={setNewPhone}
         handleSubmit={addNewPerson}/>
-
       <h2>Numbers</h2>
 
-      <Persons text={filter} persons={persons}/>
-      
+      <Persons persons={persons} filter={filter} deletePerson={handleDeletePerson}/>
     </div>
   )
 }
