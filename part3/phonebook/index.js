@@ -1,6 +1,11 @@
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const crypto = require('crypto')
+
+require('dotenv').config()
+
+const Phonebook = require('./models/phonebook')
 
 const app = express()
 app.use(express.static('build'))
@@ -57,65 +62,126 @@ app.get('/', (request, response) => {
     response.send("<h1>Hello world!</h1>")
 })
 
-app.get('/api/persons', (request, response) => {
-    response.json(data)
+app.get('/api/persons', (request, response, next) => {
+    Phonebook.find({})
+        .then(result => {
+            response.json(result)
+        })
+        .catch(error => {
+            response.status(404).json({
+                error: 'can not retrieve information from the database'
+            })
+        })
 })
 
 app.get('/info', (request, response) => {
-    response.send(`<p>Phonebook has info for ${data.length} people</p><p>${new Date()}</p>`)
+    Phonebook.estimatedDocumentCount()
+        .then(result => {
+            response.send(`<p>Phonebook has info for ${result} people</p><p>${new Date()}</p>`)        
+        })
+        .catch(error => {
+            response.status(404).json({
+                error
+            })
+        })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    let id = Number(request.params.id)
-    let object = data.find(item => item.id === id)
-    
-    if (object) {
-        response.json(object)
-    } else {
-        response.status(404).end()
-    }
+app.get('/api/persons/:id', (request, response, next) => {
+    Phonebook.findById(request.params.id)
+        .then(result => {
+            if (result) {
+                response.json(result)
+            } else {
+                response.status(404).json({
+                    error: 'can not find the id'
+                })
+            }
+        })
+        .catch(error => {
+            next(error)
+        })
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    let id = Number(request.params.id) 
-    let object = data.find(item => item.id === id) 
-
-    if (object) {
-        data = data.filter(item => item.id !== object.id)
-        response.status(204).end()
-    } else {
-        response.status(404).end()
-    }
+app.delete('/api/persons/:id', (request, response, next) => {
+    Phonebook.findByIdAndRemove(request.params.id)
+        .then(result => {
+            if (result) {
+                response.status(204).end()
+            } else {
+                return response.status(400).json({
+                    error: 'id does not exist'
+                })
+            }
+            
+        })
+        .catch(error => {
+            next(error)
+        })
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
-    if (body.name && body.number) {
-        const duplicatedName = data.find(item => item.name === body.name)
-        if (duplicatedName) {
-            return response.status(400).json({
-                error: 'name should be unique'
-            })
-        }
+    const id = crypto.randomBytes(12).toString('hex')
+    const phonebook = new Phonebook({
+        _id: id,
+        name: body.name,
+        number: body.number
+    })
 
-        const id = Math.random(2^10)
-        const object = {
-            id,
-            name: body.name,
-            number: body.number
-        }
-        data = data.concat(object)
-
-        response.json(object)
-    } else {
-        return response.status(400).json({
-            error: 'content missing'
+    phonebook.save()
+        .then(result => {
+            response.json(result)
         })
-    }
+        .catch(error => {
+            next(error)
+        })
 })
 
-const PORT = process.env.PORT || 3001 
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+    const id = request.params.id
+
+    const phonebook = {
+        _id: id, 
+        name: body.name,
+        number: body.number
+    }
+
+    Phonebook.findByIdAndUpdate(id, phonebook, {new: true})
+        .then(result => {
+            if (result) {
+                response.json(result)
+            } else {
+                response.status(500).end()
+            }
+        })
+        .catch(error => {
+            next(error)
+        })
+})
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message) 
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({
+            error: 'malformated id'
+        })
+    }
+
+    return response.status(500).end()
+}
+app.use(errorHandler)
+
+const unknowEndPoint = (request, response) => {
+    response.status(400).send({
+        error: 'unknow endpoint'
+    })
+}
+app.use(unknowEndPoint)
+
+const PORT = process.env.PORT 
 app.listen(PORT, () => {
     console.log(`Server is running on Port ${PORT}`)
 })

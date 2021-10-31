@@ -51,7 +51,7 @@ const App = () => {
 
   const addNewPerson = (event) => {
     event.preventDefault()
-
+    
     // find duplicate
     const duplicatedPerson = persons.find(person => person.name === newName)
 
