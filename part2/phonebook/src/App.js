@@ -22,6 +22,14 @@ const App = () => {
     setTimeout(() => { setNotificationMessage('')}, timeOutForNotificationMessage)
   }
 
+  const notifyErrorWithTimeout = (boolVal, message) => {
+    // update notification 
+    setError(boolVal)
+    setNotificationMessage(message)
+    // set time out to delete notification 
+    setTimeOutForNotification()
+  }
+
   useEffect(() => {
     personServices.getPersons()
       .then(data => {
@@ -61,20 +69,16 @@ const App = () => {
         name: newName,
         number: newPhone
       }
+      console.log('tesing inside function')
       // post request to add new person into db.json
       personServices.create(newPerson)
         .then(data => {
           // update new states 
           setPersons(persons.concat(data))
-
-          // update notification 
-          setError(false)
-          setNotificationMessage(`Added ${data.name}`)
-          // set time out to delete notification 
-          setTimeOutForNotification()
+          notifyErrorWithTimeout(false, `Added ${data.name}`)
         })
         .catch(error => {
-          console.log(error)
+          notifyErrorWithTimeout(true, error.response.data.error)
         })
     } else {
       // update phone number of existed person in the phone book
@@ -89,21 +93,15 @@ const App = () => {
           .then(data => {
             switch(data.status) {
               case 200: {
-                setPersons(persons.map(person => person.name !== updatedPerson.name ? person : updatedPerson))
-                // update notification 
-                setError(false)
-                setNotificationMessage(`Phone number of ${updatedPerson.name} is changed`)
-
-                setTimeOutForNotification()
+                setPersons(persons.map(person => person.name !== updatedPerson.name ? person : updatedPerson))      
+                notifyErrorWithTimeout(false, `Phone number of ${updatedPerson.name} is changed`)
                 break
               }
               default: {}
             }
           })
-          .catch(error => {
-            setError(true)
-            setNotificationMessage(`Information of ${updatedPerson.name} has already been removed from the server`)
-            setTimeOutForNotification()
+          .catch(error => {                      
+            notifyErrorWithTimeout(true, `Information of ${updatedPerson.name} has already been removed from the server`)            
             // update state 
             personServices.getPersons()
               .then(data => setPersons(data))
@@ -128,6 +126,7 @@ const App = () => {
 
           // update states 
           setPersons(filteredPersons)
+          notifyErrorWithTimeout(false, `Deleted ${deletedPerson.name} successfully`)
         })
         .catch(error => {
           console.log(error)
