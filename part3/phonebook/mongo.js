@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
 const paramLength = process.argv.length
 
@@ -20,6 +21,7 @@ const phonebookSchema = new mongoose.Schema({
     name: String,
     number: String
 })
+phonebookSchema.plugin(uniqueValidator)
 
 // create model in the collection 
 const Phonebook = mongoose.model('Phonebook', phonebookSchema)
