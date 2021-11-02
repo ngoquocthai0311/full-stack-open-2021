@@ -1,6 +1,6 @@
 const mongo = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
-
+/* global process*/
 const url = process.env.MONGODB_URI
 mongo.connect(url)
     .then(result => {

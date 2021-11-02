@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
+/*global process*/
 const paramLength = process.argv.length
 
 if (paramLength < 3 || paramLength > 5 || paramLength === 4) {
@@ -15,7 +16,7 @@ const url = `mongodb+srv://fullstack:${password}@cluster0.82gav.mongodb.net/phon
 // connect the application to db
 mongoose.connect(url)
 
-// create Schema 
+// create Schema
 const phonebookSchema = new mongoose.Schema({
     _id: String,
     name: String,
@@ -23,14 +24,14 @@ const phonebookSchema = new mongoose.Schema({
 })
 phonebookSchema.plugin(uniqueValidator)
 
-// create model in the collection 
+// create model in the collection
 const Phonebook = mongoose.model('Phonebook', phonebookSchema)
 
-// execute the below if the length of argurment is correct 
+// execute the below if the length of argurment is correct
 if (paramLength === 3) {
     Phonebook.find({})
         .then(result => {
-            console.log('Phonebook:')            
+            console.log('Phonebook:')
             result.map(item => console.log(`${item.name} ${item.number}`))
             mongoose.connection.close()
         })

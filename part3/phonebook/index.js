@@ -14,9 +14,8 @@ app.use(express.json())
 
 morgan.token('data', (request, response) => {
     const body = request.body
-    
     if (!body.name && !body.number) {
-        return ""
+        return ''
     }
     const obj = {
         name: body.name,
@@ -26,40 +25,17 @@ morgan.token('data', (request, response) => {
 })
 app.use(morgan(function (tokens, req, res) {
     return [
-      tokens.method(req, res),
-      tokens.url(req, res),
-      tokens.status(req, res),
-      tokens.res(req, res, 'content-length'), '-',
-      tokens['response-time'](req, res), 'ms',
-      tokens.data(req, res)
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms',
+        tokens.data(req, res)
     ].join(' ')
-  }))
-
-let data = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+}))
 
 app.get('/', (request, response) => {
-    response.send("<h1>Hello world!</h1>")
+    response.send('<h1>Hello world!</h1>')
 })
 
 app.get('/api/persons', (request, response, next) => {
@@ -67,7 +43,7 @@ app.get('/api/persons', (request, response, next) => {
         .then(result => {
             response.json(result)
         })
-        .catch(error => {
+        .catch(() => {
             response.status(404).json({
                 error: 'can not retrieve information from the database'
             })
@@ -77,7 +53,7 @@ app.get('/api/persons', (request, response, next) => {
 app.get('/info', (request, response) => {
     Phonebook.estimatedDocumentCount()
         .then(result => {
-            response.send(`<p>Phonebook has info for ${result} people</p><p>${new Date()}</p>`)        
+            response.send(`<p>Phonebook has info for ${result} people</p><p>${new Date()}</p>`)
         })
         .catch(error => {
             response.status(404).json({
@@ -112,7 +88,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
                     error: 'id does not exist'
                 })
             }
-            
         })
         .catch(error => {
             next(error)
@@ -143,12 +118,12 @@ app.put('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
 
     const phonebook = {
-        _id: id, 
+        _id: id,
         name: body.name,
         number: body.number
     }
 
-    Phonebook.findByIdAndUpdate(id, phonebook, {new: true})
+    Phonebook.findByIdAndUpdate(id, phonebook, { new: true })
         .then(result => {
             if (result) {
                 response.json(result)
@@ -162,7 +137,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 })
 
 const errorHandler = (error, request, response, next) => {
-    console.log(error.message) 
+    console.log(error.message)
 
     if (error.name === 'CastError') {
         return response.status(400).send({
@@ -186,7 +161,6 @@ const unknowEndPoint = (request, response) => {
 }
 app.use(unknowEndPoint)
 
-const PORT = process.env.PORT 
-app.listen(PORT, () => {
-    console.log(`Server is running on Port ${PORT}`)
-})
+/*global process*/
+const PORT = process.env.PORT
+app.listen(PORT, () => { console.log(`Server is running on Port ${PORT}`)})
