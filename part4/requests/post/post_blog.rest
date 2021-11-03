@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "GrossyPelosi",
-    "author": "Dan Pelosi",
-    "url": "https://www.danpelosi.com/",
-    "likes": 2
+    "title": "Shot from the Street",
+    "author": "Lizzy Hadfield",
+    "url": "https://www.lizzyhadfield.com/",
+    "likes": 4
 }

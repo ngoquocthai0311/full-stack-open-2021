@@ -3,7 +3,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
-const Blog = require('./models/Blog')
+const blogRouter = require('./controllers/blogs')
 
 const app = express()
 app.use(cors())
@@ -40,26 +40,7 @@ app.use(express.json())
 app.get('/', (request, response) => {
     response.send('<h1>Hello world</h1>')
 })
-app.get('/api/blogs', (request, response) => {
-    Blog
-        .find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
-})
-
-app.post('/api/blogs', (request, response, next) => {    
-    const blog = new Blog(request.body)
-
-    blog
-        .save()
-        .then(result => {
-            response.status(201).json(result)
-        })
-        .catch(error => {
-            next(error)
-        })
-})
+app.use('/api/blogs', blogRouter)
 
 const errorHandler = (error, request, response, next) => {    
         
