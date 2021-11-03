@@ -3,6 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
+const logger = require('./utils/logger')
 
 require('dotenv').config()
 
@@ -46,11 +47,11 @@ const Blog = mongoose.model('Blog', blogSchema)
 
 const mongoUrl = process.env.MONGODB_URI
 mongoose.connect(mongoUrl)
-    .then(() => {
-        console.log('connected to mongodb')
+    .then(() => {      
+        logger.info('connected to mongodb')
     })
     .catch(error => {
-        console.log(error)
+        logger.error('can not connect to mongodb', error.message)        
     })
 
 app.use(cors())
@@ -81,16 +82,7 @@ app.post('/api/blogs', (request, response, next) => {
 })
 
 const errorHandler = (error, request, response, next) => {    
-    
-    // if (error.name === 'CastError') {
-    //     response.status(400).json({
-    //         error: 'malformed'
-    //     })
-    // } else if (error.name === 'ValidationError') {
-    //     response.status(400).json({
-    //         error: 'validation error'
-    //     })
-    // }
+        
     switch(error.name){
         case 'CastError': {
             response.status(400).json({
@@ -123,6 +115,6 @@ const unknowEndPoint = (request, response) => {
 app.use(unknowEndPoint)
 
 const PORT = process.env.PORT
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+app.listen(PORT, () => {    
+    logger.info(`Server running on port ${PORT}`)
 })
