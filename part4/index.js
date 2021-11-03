@@ -4,8 +4,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
 const logger = require('./utils/logger')
-
-require('dotenv').config()
+const config = require('./utils/config')
 
 const app = express()
 app.use(cors())
@@ -45,8 +44,7 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema)
 
-const mongoUrl = process.env.MONGODB_URI
-mongoose.connect(mongoUrl)
+mongoose.connect(config.MONGODB_URI)
     .then(() => {      
         logger.info('connected to mongodb')
     })
@@ -114,7 +112,6 @@ const unknowEndPoint = (request, response) => {
 }
 app.use(unknowEndPoint)
 
-const PORT = process.env.PORT
-app.listen(PORT, () => {    
-    logger.info(`Server running on port ${PORT}`)
+app.listen(config.PORT, () => {    
+    logger.info(`Server running on port ${config.PORT}`)
 })
