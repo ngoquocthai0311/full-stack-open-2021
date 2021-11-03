@@ -17,10 +17,10 @@ morgan.token('data', (request, response) => {
     }
 
     const blogObj = {
-        title: body.listen,
+        title: body.title,
         author: body.author,
         url: body.url,
-        body: body.likes
+        likes: body.likes
     }
     return JSON.stringify(blogObj)
 })
@@ -67,15 +67,60 @@ app.get('/api/blogs', (request, response) => {
         })
 })
 
-app.post('/api/blogs', (request, response) => {
+app.post('/api/blogs', (request, response, next) => {    
     const blog = new Blog(request.body)
 
     blog
         .save()
         .then(result => {
-        response.status(201).json(result)
+            response.status(201).json(result)
+        })
+        .catch(error => {
+            next(error)
         })
 })
+
+const errorHandler = (error, request, response, next) => {    
+    
+    // if (error.name === 'CastError') {
+    //     response.status(400).json({
+    //         error: 'malformed'
+    //     })
+    // } else if (error.name === 'ValidationError') {
+    //     response.status(400).json({
+    //         error: 'validation error'
+    //     })
+    // }
+    switch(error.name){
+        case 'CastError': {
+            response.status(400).json({
+                error: 'malformed'
+            })
+            break;
+        }
+        case 'ValidationError': {
+            response.status(400).json({
+                error: 'validation error'
+            })
+            break;
+        }       
+        case 'MongooseError': {
+            response.status(400).json({
+                error: 'time out'
+            })
+            break;
+        }
+    }
+    next(error)
+}
+app.use(errorHandler)
+
+const unknowEndPoint = (request, response) => {
+    response.status(400).json({
+        error: 'unknown endpoint'
+    })
+}
+app.use(unknowEndPoint)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
