@@ -1,10 +1,9 @@
-const http = require('http')
 const express = require('express')
 const cors = require('cors')
-const mongoose = require('mongoose')
 const morgan = require('morgan')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
+const Blog = require('./models/Blog')
 
 const app = express()
 app.use(cors())
@@ -34,23 +33,6 @@ app.use(morgan(function (tokens, req, res) {
         tokens.data(req, res)
     ].join(' ')
 }))
-
-const blogSchema = new mongoose.Schema({
-    title: String,
-    author: String,
-    url: String,
-    likes: Number
-})
-
-const Blog = mongoose.model('Blog', blogSchema)
-
-mongoose.connect(config.MONGODB_URI)
-    .then(() => {      
-        logger.info('connected to mongodb')
-    })
-    .catch(error => {
-        logger.error('can not connect to mongodb', error.message)        
-    })
 
 app.use(cors())
 app.use(express.json())
@@ -99,6 +81,11 @@ const errorHandler = (error, request, response, next) => {
                 error: 'time out'
             })
             break;
+        }
+        default: {
+            response.status(400).json({
+                error: error.message
+            })
         }
     }
     next(error)
