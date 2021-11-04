@@ -3,11 +3,11 @@ const logger = require('../utils/logger')
 const config = require('../utils/config')
 
 mongoose.connect(config.MONGODB_URI)
-    .then(() => {      
+    .then(() => {
         logger.info('connected to mongodb')
     })
     .catch(error => {
-        logger.error('can not connect to mongodb', error.message)        
+        logger.error('can not connect to mongodb', error.message)
     })
 
 const blogSchema = new mongoose.Schema({

@@ -26,31 +26,31 @@ const morganLog = morgan(function (tokens, req, res) {
     ].join(' ')
 })
 
-const errorHandler = (error, request, response, next) => {            
+const errorHandler = (error, request, response, next) => {
     switch(error.name){
-        case 'CastError': {
-            response.status(400).json({
-                error: 'malformed'
-            })
-            break;
-        }
-        case 'ValidationError': {
-            response.status(400).json({
-                error: 'validation error'
-            })
-            break;
-        }       
-        case 'MongooseError': {
-            response.status(400).json({
-                error: 'time out'
-            })
-            break;
-        }
-        default: {
-            response.status(400).json({
-                error: error.message
-            })
-        }
+    case 'CastError': {
+        response.status(400).json({
+            error: 'malformed'
+        })
+        break
+    }
+    case 'ValidationError': {
+        response.status(400).json({
+            error: 'validation error'
+        })
+        break
+    }
+    case 'MongooseError': {
+        response.status(400).json({
+            error: 'time out'
+        })
+        break
+    }
+    default: {
+        response.status(400).json({
+            error: error.message
+        })
+    }
     }
     next(error)
 }
