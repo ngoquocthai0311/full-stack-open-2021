@@ -1,3 +1,5 @@
+const lodash = require('lodash')
+
 const dummy = (blogs) => {
     return 1
 }
@@ -13,6 +15,43 @@ const favoriteBlog = (blogs) => {
     return (blogs.length === 0) ? null : blogs.find(blog => blog.likes === maxLikes)
 }
 
+const mostBlogs = (blogs) => {
+    if (blogs.length === 0) {
+        return null
+    } else if (blogs.length === 1) {
+        return {
+            author: blogs[0].author,
+            blog: 1
+        }
+    }
+
+    const authors = blogs.map(item => item.author)
+
+    // still have no idea of how flatten works and the attributes of aggreate objects of lodash.groupBy()
+    // but still the guy providing the code nailed it so ...
+    // link: https://stackoverflow.com/questions/31681732/lodash-get-duplicate-values-from-an-array
+    const nonDuplicateAuthors = lodash.groupBy([...authors], (item) => item )
+    const notUniqueAuthors = lodash.uniq(lodash.flatten(lodash.filter(nonDuplicateAuthors, item => item.length > 1)))
+
+    let maxBlogs = 0
+    let result = null
+    notUniqueAuthors.forEach(author => {
+        let count = 0
+        blogs.find(blog => {
+            if (blog.author === author) {
+                count = count + 1
+            }
+        })
+        if (maxBlogs < count) {
+            result = {
+                author,
+                blogs: count
+            }
+        }
+    })
+    return result
+}
+
 module.exports = {
-    dummy, totalLikes, favoriteBlog
+    dummy, totalLikes, favoriteBlog, mostBlogs
 }
