@@ -52,6 +52,29 @@ const mostBlogs = (blogs) => {
     return result
 }
 
+const mostLikes = (blogs) => {
+    const nonDuplicateAuthors = lodash.uniq([...blogs.map(blog => blog.author)])
+
+    let mostlikes = 0
+    let result = null
+    nonDuplicateAuthors.forEach(item => {
+        let totalikes = 0
+        blogs.find(blog => {
+            if (blog.author === item) {
+                totalikes = totalikes + blog.likes
+            }
+        })
+        if (totalikes > mostlikes) {
+            mostlikes = totalikes
+            result = {
+                author: item,
+                likes: mostlikes
+            }
+        }
+    })
+    return result
+}
+
 module.exports = {
-    dummy, totalLikes, favoriteBlog, mostBlogs
+    dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }
