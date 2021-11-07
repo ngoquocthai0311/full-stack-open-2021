@@ -11,7 +11,15 @@ blogRouter.get('/', async (request, response, next) => {
 })
 
 blogRouter.post('/', async (request, response, next) => {
-    const blog = new Blog(request.body)
+    const body = request.body
+
+    // if there is no number in the body, assign it to zero
+    const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes || 0
+    })
 
     try {
         const savedBlog = await blog.save()
@@ -19,14 +27,6 @@ blogRouter.post('/', async (request, response, next) => {
     } catch(error)  {
         next(error)
     }
-    // blog
-    //     .save()
-    //     .then(result => {
-    //         response.status(201).json(result)
-    //     })
-    //     .catch(error => {
-    //         next(error)
-    //     })
 })
 
 module.exports = blogRouter

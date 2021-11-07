@@ -7,8 +7,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(middleware.morganLog)
-app.use(cors())
-app.use(express.json())
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello world</h1>')

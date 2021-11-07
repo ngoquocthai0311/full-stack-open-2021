@@ -51,6 +51,41 @@ describe('get request', () => {
     })
 })
 
+describe('post request', () => {
+    test('a valid blog can be added', async () => {
+        await api
+            .post('/api/blogs')
+            .send(helper.newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+        const titles = response.body.map(blog => blog.title)
+        const expectedTitle = 'Canonical string reduction'
+
+        expect(response.body).toHaveLength(helper.initalBlogs.length + 1)
+        expect(titles).toContain(expectedTitle)
+    })
+    test('blog without likes can be added', async () => {
+        const newBlog = {
+            'title': 'Shot from the Street',
+            'author': 'Lizzy Hadfield',
+            'url': 'https://www.lizzyhadfield.com/'
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+        const likes = response.body.map(blog => blog.likes)
+        expect(response.body).toHaveLength(helper.initalBlogs.length + 1)
+        expect(likes).toContain(0)
+    })
+})
+
 afterAll(() => {
     mongo.connection.close()
 })

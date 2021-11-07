@@ -1,3 +1,5 @@
+const Blog = require('../models/Blog')
+
 const initalBlogs = [
     {
         _id: '5a422a851b54a676234d17f7',
@@ -17,6 +19,30 @@ const initalBlogs = [
     },
 ]
 
+const newBlog = {
+    title: 'Canonical string reduction',
+    author: 'Edsger W. Dijkstra',
+    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+    likes: 12,
+}
+
+const nonExistBlog = async () => {
+    const blogObject = new Blog({
+        'title': 'Shot from the Street',
+        'author': 'Lizzy Hadfield',
+        'url': 'https://www.lizzyhadfield.com/',
+        'likes': 4
+    })
+    await blogObject.save()
+    await blogObject.remove()
+
+    return blogObject._id.toString()
+}
+
+const blogsInDb = async () => {
+    const blogs = await Blog.find({})
+    return blogs.map(blog => blog.toJSON())
+}
 module.exports = {
-    initalBlogs
+    initalBlogs, newBlog, nonExistBlog, blogsInDb
 }
