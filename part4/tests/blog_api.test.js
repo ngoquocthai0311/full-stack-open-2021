@@ -19,7 +19,7 @@ beforeEach(async () => {
         let blog = new Blog(each)
         await blog.save()
     }
-})
+}, 10000)
 
 const api = supertest(app)
 
@@ -37,6 +37,13 @@ describe('get request', () => {
     test('the first blog has the title React patterns', async () => {
         const response = await api.get('/api/blogs')
         expect(response.body[0].title).toBe('React patterns')
+    })
+    test('a specific blog is within the returned blogs', async () => {
+        const response = await api.get('/api/blogs')
+
+        const ids = response.body.map(blog => blog.id)
+        const specificedID = '5a422a851b54a676234d17f7'
+        expect(ids).toContain(specificedID)
     })
 })
 
