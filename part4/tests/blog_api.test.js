@@ -79,10 +79,24 @@ describe('post request', () => {
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
-        const response = await api.get('/api/blogs')
-        const likes = response.body.map(blog => blog.likes)
-        expect(response.body).toHaveLength(helper.initalBlogs.length + 1)
+        const blogs = await helper.blogsInDb()
+        const likes = blogs.map(blog => blog.likes)
+        expect(blogs).toHaveLength(helper.initalBlogs.length + 1)
         expect(likes).toContain(0)
+    })
+    test('blog without title and url can not be added', async () => {
+        const blogWithoutTitleAndUrl = {
+            'author': 'Lizzy Hadfield',
+            'likes': 4
+        }
+        await api
+            .post('/api/blogs')
+            .send(blogWithoutTitleAndUrl)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        expect(blogs).toHaveLength(helper.initalBlogs.length)
     })
 })
 
