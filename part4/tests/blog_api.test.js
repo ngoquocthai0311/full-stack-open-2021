@@ -100,6 +100,29 @@ describe('post request', () => {
     })
 })
 
+describe('delete request', () => {
+    test('a valid id can be used to delete the blog', async () => {
+        await api
+            .delete(`/api/blogs/${helper.initalBlogs[0]._id}`)
+            .expect(204)
+
+        const blogs = await helper.blogsInDb()
+        const ids = blogs.map(blog => blog.id)
+
+        expect(blogs).toHaveLength(helper.initalBlogs.length - 1)
+        expect(ids).not.toContain(helper.initalBlogs[0]._id)
+    })
+    test('an invalid id can not be used', async () => {
+        await api
+            .delete('/api/blogs/invalidid')
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        expect(blogs).toHaveLength(helper.initalBlogs.length)
+    })
+})
+
 afterAll(() => {
     mongo.connection.close()
 })
