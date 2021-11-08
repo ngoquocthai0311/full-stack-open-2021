@@ -30,7 +30,7 @@ const errorHandler = (error, request, response, next) => {
     switch(error.name){
     case 'CastError': {
         response.status(400).json({
-            error: 'malformed'
+            error: 'malformed id'
         })
         break
     }

@@ -79,10 +79,84 @@ describe('post request', () => {
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
-        const response = await api.get('/api/blogs')
-        const likes = response.body.map(blog => blog.likes)
-        expect(response.body).toHaveLength(helper.initalBlogs.length + 1)
+        const blogs = await helper.blogsInDb()
+        const likes = blogs.map(blog => blog.likes)
+        expect(blogs).toHaveLength(helper.initalBlogs.length + 1)
         expect(likes).toContain(0)
+    })
+    test('blog without title and url can not be added', async () => {
+        const blogWithoutTitleAndUrl = {
+            'author': 'Lizzy Hadfield',
+            'likes': 4
+        }
+        await api
+            .post('/api/blogs')
+            .send(blogWithoutTitleAndUrl)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        expect(blogs).toHaveLength(helper.initalBlogs.length)
+    })
+})
+
+describe('delete request', () => {
+    test('a valid id can be used to delete the blog', async () => {
+        await api
+            .delete(`/api/blogs/${helper.initalBlogs[0]._id}`)
+            .expect(204)
+
+        const blogs = await helper.blogsInDb()
+        const ids = blogs.map(blog => blog.id)
+
+        expect(blogs).toHaveLength(helper.initalBlogs.length - 1)
+        expect(ids).not.toContain(helper.initalBlogs[0]._id)
+    })
+    test('an invalid id can not be used', async () => {
+        await api
+            .delete('/api/blogs/invalidid')
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        expect(blogs).toHaveLength(helper.initalBlogs.length)
+    })
+})
+
+describe('put request', () => {
+    test('a valid id can be used to update blog', async () => {
+        const validID = helper.initalBlogs[0]._id
+        const updatedObject = {
+            ...helper.initalBlogs[0],
+            likes: 10
+        }
+
+        await api
+            .put(`/api/blogs/${validID}`)
+            .send(updatedObject)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        const likeslist = blogs.map(blog => blog.likes)
+
+        expect(likeslist).toContain(updatedObject.likes)
+    })
+    test('an invalid id can not be added', async () => {
+        const invalidID = '123invalid'
+        const updatedObject = {
+            ...helper.initalBlogs[0],
+            likes: 10
+        }
+        await api
+            .put(`/api/blogs/${invalidID}`)
+            .send(updatedObject)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        const likes = blogs.map(blog => blog.likes)
+        expect(likes).not.toContain(updatedObject.likes)
     })
 })
 
