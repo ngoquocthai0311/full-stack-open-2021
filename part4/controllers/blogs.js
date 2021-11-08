@@ -40,4 +40,25 @@ blogRouter.delete('/:id', async (request, response, next) => {
     }
 })
 
+blogRouter.put('/:id', async (request, response, next) => {
+    const id = request.params.id
+    const body = request.body
+
+    const blogObject = {
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes
+    }
+
+    try {
+        // { new: true } param will cause the event handler to be called
+        // with the new modified document instead of the original
+        await Blog.findByIdAndUpdate(id, blogObject, { new: true })
+        response.status(200).json(blogObject)
+    } catch (error) {
+        next(error)
+    }
+})
+
 module.exports = blogRouter

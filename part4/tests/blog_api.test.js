@@ -123,6 +123,43 @@ describe('delete request', () => {
     })
 })
 
+describe('put request', () => {
+    test('a valid id can be used to update blog', async () => {
+        const validID = helper.initalBlogs[0]._id
+        const updatedObject = {
+            ...helper.initalBlogs[0],
+            likes: 10
+        }
+
+        await api
+            .put(`/api/blogs/${validID}`)
+            .send(updatedObject)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        const likeslist = blogs.map(blog => blog.likes)
+
+        expect(likeslist).toContain(updatedObject.likes)
+    })
+    test('an invalid id can not be added', async () => {
+        const invalidID = '123invalid'
+        const updatedObject = {
+            ...helper.initalBlogs[0],
+            likes: 10
+        }
+        await api
+            .put(`/api/blogs/${invalidID}`)
+            .send(updatedObject)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const blogs = await helper.blogsInDb()
+        const likes = blogs.map(blog => blog.likes)
+        expect(likes).not.toContain(updatedObject.likes)
+    })
+})
+
 afterAll(() => {
     mongo.connection.close()
 })

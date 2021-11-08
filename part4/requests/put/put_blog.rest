@@ -1,0 +1,9 @@
+PUT http://localhost:3003/api/blogs/6188b07cba05b63be2a15d7d
+Content-Type: application/json
+
+{
+    "title": "Shot from the Street",
+    "author": "Lizzy Hadfield",
+    "url": "https://www.lizzyhadfield.com/",
+    "likes": 5
+}
