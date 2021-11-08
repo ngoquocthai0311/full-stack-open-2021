@@ -33,8 +33,8 @@ blogRouter.delete('/:id', async (request, response, next) => {
     const id = request.params.id
 
     try {
-        const deletedBlog = await Blog.findByIdAndRemove(id)
-        response.status(204).json(deletedBlog)
+        await Blog.findByIdAndRemove(id)
+        response.status(204).end()
     } catch (error) {
         next(error)
     }
