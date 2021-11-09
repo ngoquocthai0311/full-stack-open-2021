@@ -23,7 +23,7 @@ userRouter.post('/', async (request, response, next) => {
         name: body.name
     })
     try {
-        user.save()
+        await user.save()
         response.status(200).json(user)
     } catch (error) {
         next(error)
