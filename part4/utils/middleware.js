@@ -36,13 +36,13 @@ const errorHandler = (error, request, response, next) => {
     }
     case 'ValidationError': {
         response.status(400).json({
-            error: 'validation error'
+            error: error.message
         })
         break
     }
     case 'MongooseError': {
         response.status(400).json({
-            error: 'time out'
+            error: error.message
         })
         break
     }
