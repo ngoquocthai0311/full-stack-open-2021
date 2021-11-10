@@ -41,6 +41,22 @@ describe('post request', () => {
         const users = await helper.usersInDb()
         expect(users).toHaveLength(helper.initialUsers.length - 1)
     })
+    test.only('the length of username which is smaller than 3 can not be added to the database', async () => {
+        const invalidUsernameUserObject = {
+            username: 'te',
+            name: 'name',
+            password: 'password'
+        }
+
+        await api
+            .post('/api/users')
+            .send(invalidUsernameUserObject)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const users = await helper.usersInDb()
+        expect(users).toHaveLength(helper.initialUsers.length - 1)
+    })
 })
 
 afterAll(() => {
