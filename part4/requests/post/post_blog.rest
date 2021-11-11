@@ -2,7 +2,7 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "userId": "618b5ea4915a9754dd15dfa0",
+    "userId": "618cafc41508c25b0c07f2e3",
     "title": "Shot from the Street",
     "author": "Lizzy Hadfield",
     "url": "https://www.lizzyhadfield.com/",
