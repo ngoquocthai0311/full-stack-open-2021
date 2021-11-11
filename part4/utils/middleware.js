@@ -26,6 +26,16 @@ const morganLog = morgan(function (tokens, req, res) {
     ].join(' ')
 })
 
+const tokenExtractor = (request, response, next) => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        request.token = authorization.substring(7)
+    } else {
+        request.token = null
+    }
+    next()
+}
+
 const errorHandler = (error, request, response, next) => {
     switch(error.name){
     case 'CastError': {
@@ -41,6 +51,12 @@ const errorHandler = (error, request, response, next) => {
         break
     }
     case 'MongooseError': {
+        response.status(400).json({
+            error: error.message
+        })
+        break
+    }
+    case 'JsonWebTokenError': {
         response.status(400).json({
             error: error.message
         })
@@ -62,5 +78,5 @@ const unknowEndPoint = (request, response) => {
 }
 
 module.exports = {
-    morganLog, errorHandler, unknowEndPoint
+    morganLog, tokenExtractor, errorHandler, unknowEndPoint
 }

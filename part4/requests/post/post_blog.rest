@@ -1,8 +1,9 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdHRpIiwiaWQiOiI2MThkMDFmMWNiNWIyNDc1NjczMDJhODQiLCJpYXQiOjE2MzY2MzEwNDh9.4i8s5JJCKXSeuNoaHXdAx6knkyl15LECM35EbxvAGtc
 
 {
-    "userId": "618b5ea4915a9754dd15dfa0",
+    "userId": "618d01f1cb5b247567302a84",
     "title": "Shot from the Street",
     "author": "Lizzy Hadfield",
     "url": "https://www.lizzyhadfield.com/",

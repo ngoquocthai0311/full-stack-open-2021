@@ -1,4 +1,5 @@
 const blogRouter = require('express').Router()
+const jwt = require('jsonwebtoken')
 const Blog = require('../models/Blog')
 const User = require('../models/User')
 
@@ -13,9 +14,15 @@ blogRouter.get('/', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {
     const body = request.body
-
+    /*global process*/
     try {
-        const user = await User.findById(body.userId)
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+        if (!request.token && !decodedToken.id) {
+            return response.status(401).json({
+                error: 'token is missing or invalid'
+            })
+        }
+        const user = await User.findById(decodedToken.id)
 
         // if there is no number in the body, assign it to zero
         const blog = new Blog({
@@ -30,16 +37,44 @@ blogRouter.post('/', async (request, response, next) => {
         await user.save()
 
         response.status(201).json(savedBlog)
-    } catch(error)  {
+    } catch (error) {
         next(error)
     }
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {
-    const id = request.params.id
-
     try {
-        await Blog.findByIdAndRemove(id)
+        // fetch blog from db
+        const blog = await Blog.findById(request.params.id)
+
+        // decode the token into object with 2 attributes
+        // { username, id }
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+        // check if decodedToken is valid
+        if (!(decodedToken.id)) {
+            return response.status(400).json({
+                error: 'token is missing or invalid'
+            })
+        }
+        // check if the user is authorized for the action
+        if (!(decodedToken.id === blog.user.toString())) {
+            return response.status(401).json({
+                error: 'unauthorized action'
+            })
+        }
+
+        // fetch user from db to update new blog list
+        const user = await User.findById(decodedToken.id)
+        user.blogs = user.blogs.filter(item => {
+            if (item.toString() !== request.params.id) {
+                return item
+            }
+        })
+        // save new list to user
+        await user.save()
+        // delete the blog from the database
+        await Blog.findByIdAndRemove(request.params.id)
         response.status(204).end()
     } catch (error) {
         next(error)
