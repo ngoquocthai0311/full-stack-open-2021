@@ -46,6 +46,12 @@ const errorHandler = (error, request, response, next) => {
         })
         break
     }
+    case 'JsonWebTokenError': {
+        response.status(400).json({
+            error: error.message
+        })
+        break
+    }
     default: {
         response.status(400).json({
             error: error.message

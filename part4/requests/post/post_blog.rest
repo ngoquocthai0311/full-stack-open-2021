@@ -1,5 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdHRpIiwiaWQiOiI2MThjYWZjNDE1MDhjMjViMGMwN2YyZTMiLCJpYXQiOjE2MzY2MTEwODN9.IT-8Sy_O4mzjUs-W948cvIaBkEJvL85hdO_nyxTWh_Y
 
 {
     "userId": "618cafc41508c25b0c07f2e3",
