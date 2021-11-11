@@ -14,11 +14,10 @@ blogRouter.get('/', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {
     const body = request.body
-    const token = request.token
     /*global process*/
     try {
-        const decodedToken = jwt.verify(token, process.env.SECRET)
-        if (!token && !decodedToken.id) {
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+        if (!request.token && !decodedToken.id) {
             return response.status(401).json({
                 error: 'token is missing or invalid'
             })
@@ -44,10 +43,38 @@ blogRouter.post('/', async (request, response, next) => {
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {
-    const id = request.params.id
-
     try {
-        await Blog.findByIdAndRemove(id)
+        // fetch blog from db
+        const blog = await Blog.findById(request.params.id)
+
+        // decode the token into object with 2 attributes
+        // { username, id }
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+        // check if decodedToken is valid
+        if (!(decodedToken.id)) {
+            return response.status(400).json({
+                error: 'token is missing or invalid'
+            })
+        }
+        // check if the user is authorized for the action
+        if (!(decodedToken.id === blog.user.toString())) {
+            return response.status(401).json({
+                error: 'unauthorized action'
+            })
+        }
+
+        // fetch user from db to update new blog list
+        const user = await User.findById(decodedToken.id)
+        user.blogs = user.blogs.filter(item => {
+            if (item.toString() !== request.params.id) {
+                return item
+            }
+        })
+        // save new list to user
+        await user.save()
+        // delete the blog from the database
+        await Blog.findByIdAndRemove(request.params.id)
         response.status(204).end()
     } catch (error) {
         next(error)
