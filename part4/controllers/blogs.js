@@ -1,7 +1,7 @@
 const blogRouter = require('express').Router()
-const jwt = require('jsonwebtoken')
 const Blog = require('../models/Blog')
 const User = require('../models/User')
+const middleware = require('../utils/middleware')
 
 blogRouter.get('/', async (request, response, next) => {
     try {
@@ -12,18 +12,10 @@ blogRouter.get('/', async (request, response, next) => {
     }
 })
 
-blogRouter.post('/', async (request, response, next) => {
+blogRouter.post('/', middleware.tokenExtractor, middleware.userExtractor, async (request, response, next) => {
     const body = request.body
-    /*global process*/
     try {
-        const decodedToken = jwt.verify(request.token, process.env.SECRET)
-        if (!request.token && !decodedToken.id) {
-            return response.status(401).json({
-                error: 'token is missing or invalid'
-            })
-        }
-        const user = await User.findById(decodedToken.id)
-
+        const user = request.user
         // if there is no number in the body, assign it to zero
         const blog = new Blog({
             user: user._id,
@@ -42,30 +34,21 @@ blogRouter.post('/', async (request, response, next) => {
     }
 })
 
-blogRouter.delete('/:id', async (request, response, next) => {
+blogRouter.delete('/:id', middleware.tokenExtractor, middleware.userExtractor, async (request, response, next) => {
     try {
         // fetch blog from db
         const blog = await Blog.findById(request.params.id)
 
-        // decode the token into object with 2 attributes
-        // { username, id }
-        const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-        // check if decodedToken is valid
-        if (!(decodedToken.id)) {
-            return response.status(400).json({
-                error: 'token is missing or invalid'
-            })
-        }
         // check if the user is authorized for the action
-        if (!(decodedToken.id === blog.user.toString())) {
+        // using equals() to compare ObjectId from mongodb instead of ===
+        if (!(request.user._id.equals(blog.user))) {
             return response.status(401).json({
                 error: 'unauthorized action'
             })
         }
 
         // fetch user from db to update new blog list
-        const user = await User.findById(decodedToken.id)
+        const user = await User.findById(request.user._id)
         user.blogs = user.blogs.filter(item => {
             if (item.toString() !== request.params.id) {
                 return item

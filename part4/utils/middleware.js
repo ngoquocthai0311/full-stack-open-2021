@@ -1,4 +1,7 @@
+const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
+const User = require('../models/User')
+// const logger = require('../utils/logger')
 
 morgan.token('data', (request, response) => {
     const body = request.body
@@ -30,53 +33,48 @@ const tokenExtractor = (request, response, next) => {
     const authorization = request.get('authorization')
     if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
         request.token = authorization.substring(7)
+        next()
     } else {
-        request.token = null
+        return response.status(401).json({
+            error: 'token is missing or invalid'
+        })
     }
-    next()
+}
+
+const userExtractor = async (request, response, next) => {
+    /*global process*/
+    try {
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+        if (!decodedToken.id) {
+            return response.status(401).json({
+                error: 'token is mising or invalid'
+            })
+        }
+        request.user = await User.findById(decodedToken.id)
+        next()
+    } catch (error) {
+        next(error)
+    }
 }
 
 const errorHandler = (error, request, response, next) => {
-    switch(error.name){
-    case 'CastError': {
-        response.status(400).json({
+    if (error.name === 'CastError') {
+        return response.status(400).json({
             error: 'malformed id'
         })
-        break
-    }
-    case 'ValidationError': {
-        response.status(400).json({
-            error: error.message
-        })
-        break
-    }
-    case 'MongooseError': {
-        response.status(400).json({
-            error: error.message
-        })
-        break
-    }
-    case 'JsonWebTokenError': {
-        response.status(400).json({
-            error: error.message
-        })
-        break
-    }
-    default: {
+    } else {
         response.status(400).json({
             error: error.message
         })
     }
-    }
-    next(error)
 }
 
 const unknowEndPoint = (request, response) => {
-    response.status(400).json({
+    response.status(404).send({
         error: 'unknown endpoint'
     })
 }
 
 module.exports = {
-    morganLog, tokenExtractor, errorHandler, unknowEndPoint
+    morganLog, tokenExtractor, userExtractor, errorHandler, unknowEndPoint
 }
