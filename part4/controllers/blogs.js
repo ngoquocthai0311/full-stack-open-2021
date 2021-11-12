@@ -64,18 +64,23 @@ blogRouter.delete('/:id', middleware.tokenExtractor, middleware.userExtractor, a
     }
 })
 
-blogRouter.put('/:id', async (request, response, next) => {
+blogRouter.put('/:id', middleware.tokenExtractor, middleware.userExtractor, async (request, response, next) => {
     const id = request.params.id
     const body = request.body
-
-    const blogObject = {
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes
-    }
-
     try {
+        const blog = Blog.findById(id)
+        if (!blog && !request.user._id.equals(blog.user)) {
+            return response.status(401).json({
+                error: 'unauthorized action'
+            })
+        }
+
+        const blogObject = {
+            title: body.title,
+            author: body.author,
+            url: body.url,
+            likes: body.likes
+        }
         // { new: true } param will cause the event handler to be called
         // with the new modified document instead of the original
         await Blog.findByIdAndUpdate(id, blogObject, { new: true })

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
 const supertest = require('supertest')
 const User = require('../models/User')
 const app = require('../app')
@@ -9,28 +8,26 @@ const api = supertest(app)
 
 beforeEach(async () => {
     await User.deleteMany({})
+    await helper.saveIntialUserToDb()
 
-    const saltRound = 10
-    const passwordHash = await bcrypt.hash(helper.initialUsers[0].password, saltRound)
-    const user = new User({
-        username: helper.initialUsers[0].username,
-        passwordHash,
-        name: helper.initialUsers[0].name
-    })
-    await user.save()
 }, 10000)
 
 describe('post request', () => {
     test('valid username can be added', async () => {
+        const newUser = {
+            'username': 'hellas',
+            'name': 'Arto Hellas',
+            'password': 'hellas'
+        }
         await api
             .post('/api/users')
-            .send(helper.initialUsers[1])
+            .send(newUser)
             .expect(200)
             .expect('Content-Type', /application\/json/)
 
         const users = await helper.usersInDb()
-        expect(users).toHaveLength(helper.initialUsers.length)
-    }, 10000)
+        expect(users).toHaveLength(helper.initialUsers.length + 1)
+    })
     test('username must be unique', async () => {
         await api
             .post('/api/users')
@@ -39,9 +36,9 @@ describe('post request', () => {
             .expect('Content-Type', /application\/json/)
 
         const users = await helper.usersInDb()
-        expect(users).toHaveLength(helper.initialUsers.length - 1)
+        expect(users).toHaveLength(helper.initialUsers.length)
     })
-    test.only('the length of username which is smaller than 3 can not be added to the database', async () => {
+    test('the length of username which is smaller than 3 can not be added to the database', async () => {
         const invalidUsernameUserObject = {
             username: 'te',
             name: 'name',
@@ -55,7 +52,7 @@ describe('post request', () => {
             .expect('Content-Type', /application\/json/)
 
         const users = await helper.usersInDb()
-        expect(users).toHaveLength(helper.initialUsers.length - 1)
+        expect(users).toHaveLength(helper.initialUsers.length)
     })
 })
 

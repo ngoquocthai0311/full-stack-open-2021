@@ -1,5 +1,6 @@
 const Blog = require('../models/Blog')
 const User = require('../models/User')
+const bcrypt = require('bcrypt')
 
 const initalBlogs = [
     {
@@ -22,23 +23,11 @@ const initalBlogs = [
 
 const initialUsers = [
     {
-        'username': 'hellas',
-        'name': 'Arto Hellas',
-        'password': 'hellas'
-    },
-    {
-        'username': 'mluukkai',
-        'password': 'hellas',
+        'username': 'matti',
+        'password': 'luukkainen',
         'name': 'Matti Luukkainen'
     }
 ]
-
-const newBlog = {
-    title: 'Canonical string reduction',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-    likes: 12,
-}
 
 const nonExistBlog = async () => {
     const blogObject = new Blog({
@@ -63,6 +52,17 @@ const usersInDb = async () => {
     return users.map(user => user.toJSON())
 }
 
+const saveIntialUserToDb = async () => {
+    const saltRound = 10
+    const passwordHash = await bcrypt.hash(initialUsers[0].password, saltRound)
+    const user = new User({
+        username: initialUsers[0].username,
+        passwordHash,
+        name: initialUsers[0].name
+    })
+    await user.save()
+}
+
 module.exports = {
-    initalBlogs, newBlog, nonExistBlog, blogsInDb, initialUsers, usersInDb
+    initalBlogs, nonExistBlog, blogsInDb, initialUsers, usersInDb, saveIntialUserToDb
 }

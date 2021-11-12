@@ -2,10 +2,18 @@ const mongo = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/Blog')
+const User = require('../models/User')
 const helper = require('../utils/test_helpers')
+
+const api = supertest(app)
 
 beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
+
+    await api
+        .post('/api/user')
+        .send(helper.initialUsers)
 
     // Promise.all() executes promises in parallel
     /*
@@ -20,8 +28,6 @@ beforeEach(async () => {
         await blog.save()
     }
 }, 10000)
-
-const api = supertest(app)
 
 describe('get request', () => {
     test('blog are returned as json', async () => {
@@ -53,9 +59,15 @@ describe('get request', () => {
 
 describe('post request', () => {
     test('a valid blog can be added', async () => {
+        const newBlog = {
+            title: 'Canonical string reduction',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+            likes: 12,
+        }
         await api
             .post('/api/blogs')
-            .send(helper.newBlog)
+            .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
