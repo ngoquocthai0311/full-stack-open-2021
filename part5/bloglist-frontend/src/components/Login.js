@@ -9,6 +9,9 @@ const Login = ({username, password, setUsername, setPassword, setUser}) => {
           setUser(user)
           setUsername('')
           setPassword('')
+
+          // save token to windows local storage
+          window.localStorage.setItem('loggedBlogListUser', JSON.stringify(user))
         } catch (error) {
           console.log(error)
         }

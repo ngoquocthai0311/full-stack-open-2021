@@ -10,6 +10,15 @@ const App = () => {
   const [password, setPassword] = useState('')
 
   useEffect(() => {
+    if (user === null) {
+      const loggedUserJson = window.localStorage.getItem('loggedBlogListUser')
+      if (loggedUserJson) {
+        setUser(JSON.parse(loggedUserJson))
+      }
+    }
+  }, [user])
+
+  useEffect(() => {
     if (user !== null) {
       async function fetchBlogs() {
         try {
@@ -21,7 +30,7 @@ const App = () => {
       }
 
       fetchBlogs()
-    }    
+    }
   }, [user])
 
   const loginForm = () => (
@@ -30,10 +39,15 @@ const App = () => {
     </>
   )
 
+  const handleLogout = () => {
+    setUser(null)
+    window.localStorage.removeItem('loggedBlogListUser')
+  }
+
   const blogRender =  () => (
       <div>
         <h2>blogs</h2>
-        <p>{user.name} logged in</p>
+        <p>{user.name} logged in <button onClick={() => {handleLogout()}}>log out</button></p>
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />
           )}
