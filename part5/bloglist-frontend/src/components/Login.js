@@ -1,5 +1,6 @@
 import React from "react"
 import LoginService from '../services/login.js'
+import BlogService from '../services/blogs.js'
 
 const Login = ({username, password, setUsername, setPassword, setUser}) => {
     const handleLogin = async (event) => {
@@ -12,6 +13,8 @@ const Login = ({username, password, setUsername, setPassword, setUser}) => {
 
           // save token to windows local storage
           window.localStorage.setItem('loggedBlogListUser', JSON.stringify(user))
+          // set token for Blog Service
+          BlogService.setToken(user.token)
         } catch (error) {
           console.log(error)
         }
