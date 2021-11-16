@@ -2,7 +2,7 @@ import React from "react"
 import LoginService from '../services/login.js'
 import BlogService from '../services/blogs.js'
 
-const Login = ({username, password, setUsername, setPassword, setUser}) => {
+const LoginForm = ({notify, username, password, setUsername, setPassword, setUser}) => {
     const handleLogin = async (event) => {
         event.preventDefault()
         try {
@@ -15,14 +15,14 @@ const Login = ({username, password, setUsername, setPassword, setUser}) => {
           window.localStorage.setItem('loggedBlogListUser', JSON.stringify(user))
           // set token for Blog Service
           BlogService.setToken(user.token)
+          notify('logged in successfully')
         } catch (error) {
-          console.log(error)
+          notify('wrong username or password', 'error')
         }
     }
 
     return (
         <div>
-            <h2>Login to application</h2>
             <form onSubmit={handleLogin}>
                 username <input type='text' name='username' value={username} onChange={({target}) => setUsername(target.value)}/> <br />
                 password <input type='password' name='password' value={password} onChange={({target}) => setPassword(target.value)}/> <br />
@@ -32,4 +32,4 @@ const Login = ({username, password, setUsername, setPassword, setUser}) => {
     )
 }
 
-export default Login
+export default LoginForm

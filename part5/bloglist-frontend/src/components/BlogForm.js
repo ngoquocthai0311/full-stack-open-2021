@@ -1,7 +1,7 @@
 import React from "react"
 import BlogService from '../services/blogs'
 
-const BlogForm = ({title, setTitle, author, setAuthor, url, setUrl, blogs, setBlogs}) => {
+const BlogForm = ({notify, title, setTitle, author, setAuthor, url, setUrl, blogs, setBlogs}) => {
     const handleCreateBlog = async (event) => {
         event.preventDefault()
         try {
@@ -12,12 +12,13 @@ const BlogForm = ({title, setTitle, author, setAuthor, url, setUrl, blogs, setBl
             }
             const data = await BlogService.createBlog(newBlog)
             setBlogs(blogs.concat(data))
+            notify(`a new blog ${title} by ${author} added`)
             // clear input field
             setTitle('')
             setAuthor('')
             setUrl('')
         } catch (error) {
-            console.log(error)
+            
         }
     }
 
