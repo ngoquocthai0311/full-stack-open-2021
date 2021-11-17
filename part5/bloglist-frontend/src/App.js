@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/Login'
@@ -12,6 +12,7 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [notificaiton, setNotification] = useState(null)
+  const loginFormRef = useRef()
 
   useEffect(() => {
     if (user === null) {
@@ -79,15 +80,34 @@ const App = () => {
   }
 
   const handleLogin = async (credentials) => {
-    const data = await loginService.login(credentials)
-    return data
+    // const data = await loginService.login(credentials)
+    // return data
+    try {
+      const data = await loginService.login(credentials)
+
+      // using hooks to update state outside LoginForm component
+      loginFormRef.current.clearInputFields()
+      // save token to windows local storage
+      window.localStorage.setItem('loggedBlogListUser', JSON.stringify(data))
+      // set token for Blog Service
+      blogService.setToken(data.token)
+      notifyWith('logged in successfully')
+
+      // update the state of parent component to trigger re-render after having done all work in this component
+      // if setUser(data) is placed above window.localStorage.setItem() the App component will be triggered to re-render 
+      // making loginForm to be unmounted
+      // link to issue: https://dev.to/jexperton/how-to-fix-the-react-memory-leak-warning-d4i
+      setUser(data)
+    } catch (error) {
+      notifyWith('wrong username or password', 'error')
+    }
   }
 
   const loginForm = () => (
     <>
       <h2>Login to application</h2>
       <Notification notification={notificaiton}/>
-      <LoginForm login={handleLogin} notify={notifyWith} setUser={setUser}/>
+      <LoginForm login={handleLogin} ref={loginFormRef}/>
     </>
   )
 

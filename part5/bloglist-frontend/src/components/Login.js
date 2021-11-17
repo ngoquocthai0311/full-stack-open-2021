@@ -1,9 +1,21 @@
-import React, { useState } from "react"
-import blogService from '../services/blogs'
+import React, { useImperativeHandle, useState } from "react"
 
-const LoginForm = ({login, notify, setUser}) => {
+const LoginForm = React.forwardRef((props, ref) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+
+    const clearInputFields = () => {
+        // clear input fields
+        setUsername('')
+        setPassword('')
+    }
+
+    useImperativeHandle(ref, () => {
+        return {
+            clearInputFields
+        }
+    })
+
 
     const handleLogin = async (event) => {
         event.preventDefault()
@@ -11,26 +23,7 @@ const LoginForm = ({login, notify, setUser}) => {
             username,
             password
         }        
-        try {
-            const data = await login(credentials)
-            // clear input fields
-            setUsername('')
-            setPassword('')
-
-            // save token to windows local storage
-            window.localStorage.setItem('loggedBlogListUser', JSON.stringify(data))
-            // set token for Blog Service
-            blogService.setToken(data.token)
-            notify('logged in successfully')
-
-            // update the state of parent component to trigger re-render after having done all work in this component
-            // if setUser(data) is placed above window.localStorage.setItem() the App component will be triggered to re-render 
-            // making loginForm to be unmounted
-            // link to issue: https://dev.to/jexperton/how-to-fix-the-react-memory-leak-warning-d4i
-            setUser(data)
-          } catch (error) {
-            notify('wrong username or password', 'error')
-          }
+        await props.login(credentials)
     }
 
     return (
@@ -42,6 +35,6 @@ const LoginForm = ({login, notify, setUser}) => {
             </form>
         </div>
     )
-}
+})
 
 export default LoginForm
