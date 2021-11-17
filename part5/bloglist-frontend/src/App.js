@@ -47,6 +47,11 @@ const App = () => {
     return unsortedBlogList.sort((item1, item2) => item2.likes - item1.likes)
   }
 
+  const filterOutBlog = (blogId) => {
+    const updatedBlogs = blogs.filter(blog => blog.id !== blogId)
+    setBlogs(updatedBlogs)
+  }
+
   const notifyWith = (message, type = 'success') => {
     setNotification({ message, type })
     setTimeout(() => {
@@ -66,13 +71,32 @@ const App = () => {
     }
 
     updatedBlog = { ...updatedBlog, user: userId }
-    const data = await blogService.updateBlog(id, updatedBlog)
-    return data
+    try {
+      const data = await blogService.updateBlog(id, updatedBlog)
+      if (!data) {
+        notifyWith('the blog is no longer exist', 'error')
+        filterOutBlog(id)
+      } else {
+        notifyWith(`The blog ${data.title} by ${data.author} updated likes to ${data.likes}`)
+        // sort the blogs after having been updated one blog 
+        const sortedBlogList = sortBlogList(blogs.map(blog => blog.id === data.id ? data : blog))
+        setBlogs(sortedBlogList)
+      }
+    } catch (error) {
+      notifyWith('something went wrong', 'error')
+    }
   }
 
-  const handleUpdateBlogList = (updatedBlog) => {
-    setBlogs(blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog))
+  const handleDeleteBlog = async (blogId) => {
+    try {
+      await blogService.deleteBlog(blogId)      
+      notifyWith('delete blog successfully')
+    } catch (error) {
+      notifyWith('the blog is no longer exist', 'error')
+    }
+    filterOutBlog(blogId)
   }
+
   const handleLogout = () => {
     setUser(null)
     window.localStorage.removeItem('loggedBlogListUser')
@@ -124,7 +148,7 @@ const App = () => {
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={handleUpdateBlog} notify={notifyWith} updateBlogList={handleUpdateBlogList}/>
+          <Blog key={blog.id} blog={blog} updateBlog={handleUpdateBlog} deleteBlog={handleDeleteBlog}/>
         )}
       </div>
   )
