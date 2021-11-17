@@ -6,6 +6,7 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import usersService from './services/users'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -47,11 +48,25 @@ const App = () => {
     }, 3000)
   }
 
-  const addBlog = async (blog) => {
+  const handleAddBlog = async (blog) => {
     const data = await blogService.createBlog(blog)
     setBlogs(blogs.concat(data))
   }
 
+  const handleUpdateBlog = async (id, updatedBlog) => {
+    const userId = await usersService.getUserId(user.username)
+    if (!userId) {
+      return null
+    }
+
+    updatedBlog = { ...updatedBlog, user: userId }
+    const data = await blogService.updateBlog(id, updatedBlog)
+    return data
+  }
+
+  const handleUpdateBlogList = (updatedBlog) => {
+    setBlogs(blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog))
+  }
   const handleLogout = () => {
     setUser(null)
     window.localStorage.removeItem('loggedBlogListUser')
@@ -80,11 +95,11 @@ const App = () => {
         <p>{user.name} logged in <button onClick={() => {handleLogout()}}>log out</button></p>
 
         <Togglable buttonLabel='create new blog'>
-          <BlogForm notify={notifyWith} addBlog={addBlog} />
+          <BlogForm notify={notifyWith} addBlog={handleAddBlog} />
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={handleUpdateBlog} notify={notifyWith} updateBlogList={handleUpdateBlogList}/>
         )}
       </div>
   )

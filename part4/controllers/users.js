@@ -11,6 +11,22 @@ userRouter.get('/', async (request, response, next) => {
     }
 })
 
+userRouter.get('/id/:username', async (request, response, next) => {
+    try {
+        const user = await User.findOne({ username: request.params.username })
+        if (!user) {
+            return response.status(404).json({
+                error: 'can not find `username`'
+            })
+        }
+        response.status(200).json({
+            id: user.id
+        })
+    } catch (error) {
+        next(error)
+    }
+})
+
 userRouter.post('/', async (request, response, next) => {
     const body = request.body
     const saltRound = 10

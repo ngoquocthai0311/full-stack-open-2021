@@ -1,10 +1,10 @@
-PUT http://localhost:3003/api/blogs/618d0252cb5b247567302a98
+PUT http://localhost:3003/api/blogs/619337b7170695287f5ba9c3
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdHRpIiwiaWQiOiI2MThkMDFmMWNiNWIyNDc1NjczMDJhODQiLCJpYXQiOjE2MzY2MzEwNDh9.4i8s5JJCKXSeuNoaHXdAx6knkyl15LECM35EbxvAGtc
 
 {
+    "user:": "61933791170695287f5ba9bc",
     "title": "Shot from the Street",
     "author": "Lizzy Hadfield",
     "url": "https://www.lizzyhadfield.com/",
-    "likes": 15
+    "likes": 10
 }

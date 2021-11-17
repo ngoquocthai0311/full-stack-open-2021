@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Blog = ({blog}) => {
+const Blog = ({blog, updateBlog, notify, updateBlogList}) => {
   const [visibility, setVisibility] = useState(false)
 
   const hideWhenVisibile = { display: visibility ? 'none' : '' }
@@ -8,6 +8,22 @@ const Blog = ({blog}) => {
 
   const toggleVisibility = () => {
     setVisibility(!visibility)
+  }
+
+  const handleLikeIncrement = async () => {
+    const requestBody = {
+      likes: blog.likes + 1,
+      author: blog.author,
+      title: blog.title,
+      url: blog.url
+    }
+    try {
+      const data = await updateBlog(blog.id, requestBody)
+      notify(`The blog ${data.title} by ${data.author} updated likes to ${data.likes}`)
+      updateBlogList(data)
+    } catch (error) {
+      notify('something went wrong', 'error')
+    }
   }
 
   const inlineStyle = {
@@ -23,7 +39,7 @@ const Blog = ({blog}) => {
     <div style={showWhenVisible}>
       {blog.title} <button onClick={toggleVisibility}>hide</button> <br />
       {blog.url} <br />
-      {blog.likes} <button>like</button> <br />
+      {blog.likes} <button onClick={handleLikeIncrement}>like</button> <br />
       {blog.author} <br />
     </div>
   </div>  

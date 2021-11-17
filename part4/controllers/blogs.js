@@ -64,12 +64,12 @@ blogRouter.delete('/:id', middleware.tokenExtractor, middleware.userExtractor, a
     }
 })
 
-blogRouter.put('/:id', middleware.tokenExtractor, middleware.userExtractor, async (request, response, next) => {
+blogRouter.put('/:id', async (request, response, next) => {
     const id = request.params.id
     const body = request.body
     try {
         const blog = Blog.findById(id)
-        if (!blog && !request.user._id.equals(blog.user)) {
+        if (!blog && body.user === blog.user.toString()) {
             return response.status(401).json({
                 error: 'unauthorized action'
             })
@@ -83,8 +83,8 @@ blogRouter.put('/:id', middleware.tokenExtractor, middleware.userExtractor, asyn
         }
         // { new: true } param will cause the event handler to be called
         // with the new modified document instead of the original
-        await Blog.findByIdAndUpdate(id, blogObject, { new: true })
-        response.status(200).json(blogObject)
+        const updatedBlogObject = await Blog.findByIdAndUpdate(id, blogObject, { new: true }).populate('user', { 'username': 1, 'name': 1 })
+        response.status(200).json(updatedBlogObject)
     } catch (error) {
         next(error)
     }
