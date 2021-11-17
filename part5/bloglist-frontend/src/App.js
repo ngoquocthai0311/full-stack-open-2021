@@ -31,7 +31,8 @@ const App = () => {
       async function fetchBlogs() {
         try {
           const data = await blogService.getAll()
-          setBlogs(data)
+          const sortedBlogList = sortBlogList(data)
+          setBlogs(sortedBlogList)
         } catch (error) {
           notifyWith(error.message, 'error')
         }
@@ -40,6 +41,10 @@ const App = () => {
       fetchBlogs()
     }
   }, [user])
+
+  const sortBlogList = (unsortedBlogList) => {
+    return unsortedBlogList.sort((item1, item2) => item2.likes - item1.likes)
+  }
 
   const notifyWith = (message, type = 'success') => {
     setNotification({ message, type })
