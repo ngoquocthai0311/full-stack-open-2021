@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-const BlogForm = ({addBlog}) => {
+const BlogForm = ({addBlog, notify}) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
@@ -12,11 +12,16 @@ const BlogForm = ({addBlog}) => {
             author,
             url
         }
-        await addBlog(newBlog)
-        // clear input field
-        setTitle('')
-        setAuthor('')
-        setUrl('')
+        try {
+            await addBlog(newBlog)
+            notify(`a new blog ${title} by ${author} added`)
+            // clear input field
+            setTitle('')
+            setAuthor('')
+            setUrl('')
+        } catch (error) {
+            notify('please fill in all required infomation in the form', 'error')
+        }
     }
 
     return (

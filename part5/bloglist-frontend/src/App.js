@@ -48,13 +48,8 @@ const App = () => {
   }
 
   const addBlog = async (blog) => {
-    try {
-      const data = await blogService.createBlog(blog)
-      setBlogs(blogs.concat(data))
-      notifyWith(`a new blog ${blog.title} by ${blog.author} added`)
-    } catch (error) {
-      notifyWith('please fill in all required infomation in the form', 'error')
-    }
+    const data = await blogService.createBlog(blog)
+    setBlogs(blogs.concat(data))
   }
 
   const handleLogout = () => {
@@ -64,27 +59,15 @@ const App = () => {
   }
 
   const handleLogin = async (credentials) => {
-    try {
-      const data = await loginService.login(credentials)
-      setUser(data)
-
-      // save token to windows local storage
-      window.localStorage.setItem('loggedBlogListUser', JSON.stringify(data))
-      console.log('why is here')
-      // set token for Blog Service
-      blogService.setToken(data.token)
-      notifyWith('logged in successfully')
-    } catch (error) {
-      notifyWith('wrong username or password', 'error')
-    }
-    
+    const data = await loginService.login(credentials)
+    return data
   }
 
   const loginForm = () => (
     <>
       <h2>Login to application</h2>
       <Notification notification={notificaiton}/>
-      <LoginForm login={handleLogin}/>
+      <LoginForm login={handleLogin} notify={notifyWith} setUser={setUser}/>
     </>
   )
 
@@ -97,7 +80,7 @@ const App = () => {
         <p>{user.name} logged in <button onClick={() => {handleLogout()}}>log out</button></p>
 
         <Togglable buttonLabel='create new blog'>
-          <BlogForm addBlog={addBlog} />
+          <BlogForm notify={notifyWith} addBlog={addBlog} />
         </Togglable>
 
         {blogs.map(blog =>
