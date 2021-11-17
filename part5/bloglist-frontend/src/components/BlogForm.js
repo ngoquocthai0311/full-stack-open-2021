@@ -1,25 +1,22 @@
-import React from "react"
-import BlogService from '../services/blogs'
+import React, { useState } from "react"
 
-const BlogForm = ({notify, title, setTitle, author, setAuthor, url, setUrl, blogs, setBlogs}) => {
+const BlogForm = ({addBlog}) => {
+    const [title, setTitle] = useState('')
+    const [author, setAuthor] = useState('')
+    const [url, setUrl] = useState('')
+
     const handleCreateBlog = async (event) => {
         event.preventDefault()
-        try {
-            const newBlog = {
-                title,
-                author,
-                url
-            }
-            const data = await BlogService.createBlog(newBlog)
-            setBlogs(blogs.concat(data))
-            notify(`a new blog ${title} by ${author} added`)
-            // clear input field
-            setTitle('')
-            setAuthor('')
-            setUrl('')
-        } catch (error) {
-            
+        const newBlog = {
+            title,
+            author,
+            url
         }
+        await addBlog(newBlog)
+        // clear input field
+        setTitle('')
+        setAuthor('')
+        setUrl('')
     }
 
     return (

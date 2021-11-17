@@ -1,24 +1,18 @@
-import React from "react"
-import LoginService from '../services/login.js'
-import BlogService from '../services/blogs.js'
+import React, { useState } from "react"
 
-const LoginForm = ({notify, username, password, setUsername, setPassword, setUser}) => {
+const LoginForm = ({login}) => {
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+
     const handleLogin = async (event) => {
         event.preventDefault()
-        try {
-          const user = await LoginService.login({ username, password }) 
-          setUser(user)
-          setUsername('')
-          setPassword('')
-
-          // save token to windows local storage
-          window.localStorage.setItem('loggedBlogListUser', JSON.stringify(user))
-          // set token for Blog Service
-          BlogService.setToken(user.token)
-          notify('logged in successfully')
-        } catch (error) {
-          notify('wrong username or password', 'error')
+        const credentials = {
+            username,
+            password
         }
+        await login(credentials)
+        setUsername('')
+        setPassword('')
     }
 
     return (

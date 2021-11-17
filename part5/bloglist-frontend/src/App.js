@@ -5,15 +5,11 @@ import LoginForm from './components/Login'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
+import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [notificaiton, setNotification] = useState(null)
 
   useEffect(() => {
@@ -51,13 +47,15 @@ const App = () => {
     }, 3000)
   }
 
-  const loginForm = () => (
-    <>
-      <h2>Login to application</h2>
-      <Notification notification={notificaiton}/>
-      <LoginForm notify={notifyWith} username={username} password={password} setUsername={setUsername} setPassword={setPassword} setUser={setUser}/>
-    </>
-  )
+  const addBlog = async (blog) => {
+    try {
+      const data = await blogService.createBlog(blog)
+      setBlogs(blogs.concat(data))
+      notifyWith(`a new blog ${blog.title} by ${blog.author} added`)
+    } catch (error) {
+      notifyWith('please fill in all required infomation in the form', 'error')
+    }
+  }
 
   const handleLogout = () => {
     setUser(null)
@@ -65,7 +63,32 @@ const App = () => {
     notifyWith('logged out successfully')
   }
 
-  const blogRender =  () => (
+  const handleLogin = async (credentials) => {
+    try {
+      const data = await loginService.login(credentials)
+      setUser(data)
+
+      // save token to windows local storage
+      window.localStorage.setItem('loggedBlogListUser', JSON.stringify(data))
+      console.log('why is here')
+      // set token for Blog Service
+      blogService.setToken(data.token)
+      notifyWith('logged in successfully')
+    } catch (error) {
+      notifyWith('wrong username or password', 'error')
+    }
+    
+  }
+
+  const loginForm = () => (
+    <>
+      <h2>Login to application</h2>
+      <Notification notification={notificaiton}/>
+      <LoginForm login={handleLogin}/>
+    </>
+  )
+
+  const blogRender = () => (
       <div>
         <h2>blogs</h2>
 
@@ -74,7 +97,7 @@ const App = () => {
         <p>{user.name} logged in <button onClick={() => {handleLogout()}}>log out</button></p>
 
         <Togglable buttonLabel='create new blog'>
-          <BlogForm notify={notifyWith} title={title} setTitle={setTitle} author={author} setAuthor={setAuthor} url={url} setUrl={setUrl} blogs={blogs} setBlogs={setBlogs}/>
+          <BlogForm addBlog={addBlog} />
         </Togglable>
 
         {blogs.map(blog =>
