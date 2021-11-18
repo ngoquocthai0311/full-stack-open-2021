@@ -83,7 +83,7 @@ const App = () => {
         setBlogs(sortedBlogList)
       }
     } catch (error) {
-      notifyWith('something went wrong', 'error')
+      notifyWith(error.mesage, 'error')
     }
   }
 
@@ -104,19 +104,14 @@ const App = () => {
   }
 
   const handleLogin = async (credentials) => {
-    // const data = await loginService.login(credentials)
-    // return data
     try {
       const data = await loginService.login(credentials)
 
-      // using hooks to update state outside LoginForm component
+      // using hooks to update state outside LoginForm component and add token
       loginFormRef.current.clearInputFields()
-      // save token to windows local storage
-      window.localStorage.setItem('loggedBlogListUser', JSON.stringify(data))
-      // set token for Blog Service
-      blogService.setToken(data.token)
-      notifyWith('logged in successfully')
+      loginFormRef.current.saveToken(data)
 
+      notifyWith('logged in successfully')
       // update the state of parent component to trigger re-render after having done all work in this component
       // if setUser(data) is placed above window.localStorage.setItem() the App component will be triggered to re-render 
       // making loginForm to be unmounted

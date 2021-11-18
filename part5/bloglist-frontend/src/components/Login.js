@@ -1,4 +1,6 @@
 import React, { useImperativeHandle, useState } from "react"
+import PropTypes from 'prop-types'
+import blogService from '../services/blogs'
 
 const LoginForm = React.forwardRef((props, ref) => {
     const [username, setUsername] = useState('')
@@ -10,9 +12,16 @@ const LoginForm = React.forwardRef((props, ref) => {
         setPassword('')
     }
 
+    const saveToken = (data) => {
+        // save token to windows local storage
+      window.localStorage.setItem('loggedBlogListUser', JSON.stringify(data))
+      // set token for Blog Service
+      blogService.setToken(data.token)
+    }
+
     useImperativeHandle(ref, () => {
         return {
-            clearInputFields
+            clearInputFields, saveToken
         }
     })
 
@@ -36,5 +45,9 @@ const LoginForm = React.forwardRef((props, ref) => {
         </div>
     )
 })
+
+LoginForm.propTypes = {
+    login: PropTypes.func.isRequired
+}
 
 export default LoginForm
