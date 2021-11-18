@@ -1,11 +1,11 @@
-import React, { useState } from "react"
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const Togglable = (props) => {
     const [visibility, setVisibility] = useState(false)
 
     const showWhenVisible = { display: visibility ? '' : 'none' }
-    const hideWhenVisible = { display: visibility ? 'none': ''}
+    const hideWhenVisible = { display: visibility ? 'none': '' }
 
     const toggleVisibility = () => {
         setVisibility(!visibility)
