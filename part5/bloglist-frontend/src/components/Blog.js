@@ -32,10 +32,10 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     }
     return (
         <div style={inlineStyle}>
-            <div style={hideWhenVisibile}>
-                {blog.title} <button onClick={toggleVisibility}>view</button>
+            <div style={hideWhenVisibile} className='short-blog'>
+                {blog.title} {blog.author} <button onClick={toggleVisibility}>view</button>
             </div>
-            <div style={showWhenVisible}>
+            <div style={showWhenVisible} className='long-blog'>
                 {blog.title} <button onClick={toggleVisibility}>hide</button> <br />
                 {blog.url} <br />
                 {blog.likes} <button onClick={handleLikeIncrement}>like</button> <br />
