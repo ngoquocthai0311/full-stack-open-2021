@@ -31,7 +31,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
         margin: '0px 0px 10px 0px'
     }
     return (
-        <div style={inlineStyle}>
+        <div style={inlineStyle} className='blog'>
             <div style={hideWhenVisibile} className='short-blog'>
                 {blog.title} {blog.author} <button onClick={toggleVisibility}>view</button>
             </div>

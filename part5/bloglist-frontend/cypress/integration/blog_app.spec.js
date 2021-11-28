@@ -37,6 +37,9 @@ describe('Blog app', () => {
         beforeEach(() => {
             cy.login({ username: 'test', password: 'test' })
             cy.createBlog({ title, author, url })
+            cy.createBlog({ title: 'blog1', author: 'author1', url: 'url1' })
+            cy.createBlog({ title: 'blog2', author: 'author2', url: 'url2' })
+            cy.createBlog({ title: 'blog3', author: 'author3', url: 'url3' })
         })
         it('A blog can be created', () => {
             cy.contains('create new blog').click()
@@ -72,6 +75,38 @@ describe('Blog app', () => {
             cy.contains(`${title} ${author}`).contains('view').click()
             cy.contains('remove').click()
             cy.contains('Unauthorized action')
+        })
+        it.only('blogs are ordered when likes are updated', () => {
+            cy.contains('blog1').parent().as('blog1')
+            cy.contains('blog2').parent().as('blog2')
+            cy.contains('blog3').parent().as('blog3')
+
+            cy.get('@blog1').contains('view').click()
+            cy.wait(1000)
+            cy.get('@blog1').contains('like').click()
+            cy.wait(1000)
+            cy.get('@blog1').contains('like').click()
+            cy.wait(1000)
+            cy.get('@blog1').contains('like').click()
+            cy.wait(1000)
+
+            cy.get('@blog2').contains('view').click()
+            cy.wait(1000)
+            cy.get('@blog2').contains('like').click()
+            cy.wait(1000)
+            cy.get('@blog2').contains('like').click()
+            cy.wait(1000)
+
+            cy.get('@blog3').contains('view').click()
+            cy.wait(1000)
+            cy.get('@blog3').contains('like').click()
+            cy.wait(1000)
+
+            cy.get('.blog').then(blogs => {
+                cy.wrap(blogs[0]).should('contain', '3')
+                cy.wrap(blogs[1]).should('contain', '2')
+                cy.wrap(blogs[2]).should('contain', '1')
+            })
         })
     })
 })
