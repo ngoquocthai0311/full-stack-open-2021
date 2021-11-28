@@ -53,5 +53,10 @@ describe('Blog app', () => {
             cy.contains('like').click()
             cy.get('.success').should('contain', `The blog ${title} by ${author} updated likes to 1`)
         })
+        it('A valid blog can be deleted', () => {
+            cy.contains(`${title} ${author}`).contains('view').click()
+            cy.contains('remove').click()
+            cy.get('.success').should('contain', 'delete blog successfully')
+        })
     })
 })

@@ -92,10 +92,15 @@ const App = () => {
         try {
             await blogService.deleteBlog(blogId)
             notifyWith('delete blog successfully')
+            filterOutBlog(blogId)
         } catch (error) {
-            notifyWith('the blog is no longer exist', 'error')
+            if (error.response.status === 401) {
+                notifyWith('Unauthorized action', 'error')
+            } else {
+                notifyWith('the blog is no longer exist', 'error')
+                filterOutBlog(blogId)
+            }
         }
-        filterOutBlog(blogId)
     }
 
     const handleLogout = () => {
