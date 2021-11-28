@@ -2,7 +2,7 @@ describe('Blog app', () => {
     beforeEach(() => {
         cy.request('POST', 'http://localhost:3000/api/testing/reset')
         // create a user in the backend
-        cy.request('POST', 'http://localhost:3003/api/users', {
+        cy.request('POST', 'http://localhost:3000/api/users', {
             username: 'test',
             password: 'test',
             name: 'Tester Test'
@@ -31,14 +31,12 @@ describe('Blog app', () => {
     })
 
     describe('When logged in', () => {
+        const title = 'Shot from the Street'
+        const author = 'Lizzy Hadfield'
+        const url = 'https://www.lizzyhadfield.com/'
         beforeEach(() => {
-            cy.request('POST', 'http://localhost:3003/api/login', {
-                username: 'test',
-                password: 'test'
-            }).then((response) => {
-                window.localStorage.setItem('loggedBlogListUser', JSON.stringify(response.body))
-                cy.visit('http://localhost:3000/')
-            })
+            cy.login({ username: 'test', password: 'test' })
+            cy.createBlog({ title, author, url })
         })
         it('A blog can be created', () => {
             cy.contains('create new blog').click()
@@ -48,6 +46,12 @@ describe('Blog app', () => {
             cy.get('#button-create').click()
             cy.get('.short-blog').should('contain', 'title author')
             cy.get('.short-blog').should('contain', 'view')
+        })
+        it('A valid can be liked', () => {
+            cy.contains(`${title} ${author}`).contains('view').click()
+            cy.contains('hide')
+            cy.contains('like').click()
+            cy.get('.success').should('contain', `The blog ${title} by ${author} updated likes to 1`)
         })
     })
 })
