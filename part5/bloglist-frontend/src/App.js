@@ -33,7 +33,6 @@ const App = () => {
             async function fetchBlogs() {
                 try {
                     const data = await blogService.getAll()
-                    console.log(data)
                     const sortedBlogList = sortBlogList(data)
                     setBlogs(sortedBlogList)
                 } catch (error) {
