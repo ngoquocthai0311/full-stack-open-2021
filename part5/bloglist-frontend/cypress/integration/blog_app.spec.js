@@ -58,5 +58,20 @@ describe('Blog app', () => {
             cy.contains('remove').click()
             cy.get('.success').should('contain', 'delete blog successfully')
         })
+        it('a valid blog can not be deleted if user did not create it', () => {
+            cy.contains('log out').click()
+            // create a user in the backend
+            cy.request('POST', 'http://localhost:3000/api/users', {
+                username: 'anothertest',
+                password: 'anothertest',
+                name: 'Anothertester Anothertester'
+            })
+            cy.visit('http://localhost:3000/')
+            cy.login({ username: 'anothertest', password: 'anothertest' })
+
+            cy.contains(`${title} ${author}`).contains('view').click()
+            cy.contains('remove').click()
+            cy.contains('Unauthorized action')
+        })
     })
 })
