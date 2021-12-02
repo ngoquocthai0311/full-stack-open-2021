@@ -13,17 +13,26 @@ const messageReducer = (state = '', action) => {
     }
 }
 
-export const setMessage = (message) => {
+const setMessage = (message) => {
     return {
         type: actionType.set,
         data: { message }
     }
 }
 
-export const removeMessage = () => {
+const removeMessage = () => {
     return {
         type: actionType.remove,
         data: { message: '' }
+    }
+}
+
+export const setNotification = (message, time) => {
+    return async dispatch => {
+        dispatch(setMessage(message))
+        setTimeout(() => {
+            dispatch(removeMessage())
+        }, time)
     }
 }
 

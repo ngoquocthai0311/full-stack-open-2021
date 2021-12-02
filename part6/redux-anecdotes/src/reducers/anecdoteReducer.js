@@ -1,3 +1,5 @@
+import anecdotesService from '../services/anecdotes'
+
 const actionType = {
     vote: 'VOTE_INCREMENT',
     add: 'NEW_ANECDOTE',
@@ -16,31 +18,42 @@ const anecdoteReducer = (state = [], action) => {
         case actionType.initialize:
             return action.data
         case actionType.vote:
-            return state.map(blog => blog.id === action.data.id ? { ...blog, votes: blog.votes + 1 } : blog)
+            return state.map(blog => blog.id === action.data.id ? action.data : blog)
         case actionType.add:
             return [ ...state, action.data ]
         default: return state
     }
 }
 
-export const increaseVote = (id) => {
-    return {
-        type: actionType.vote,
-        data: { id }
+export const increaseVote = (anecdote) => {
+    return async dispatch => { 
+        const updatedAnecdote = { ...anecdote, votes: anecdote.votes + 1 }
+        console.log("checkign ne: ", updatedAnecdote)
+        const response = await anecdotesService.increaseVote(updatedAnecdote)
+        dispatch({
+            type: actionType.vote,
+            data: response
+        })
     }
 }
 
 export const addNewAnecdote = (content) => {
-    return {
-        type: actionType.add,
-        data: content
+    return async dispatch => {
+        const newAnecdote = await anecdotesService.createNewAnecdote(asObject(content))
+        dispatch({
+            type: actionType.add,
+            data: newAnecdote
+        })
     }
 }
 
-export const initializeAnecdotes = (anecdotes) => {
-    return {
-        type: actionType.initialize,
-        data: anecdotes
+export const initializeAnecdotes = () => {
+    return async dispatch => {
+        const anecdotes = await anecdotesService.getAllAnecdotes()
+        dispatch({
+            type: actionType.initialize,
+            data: anecdotes
+        })
     }
 }
 
