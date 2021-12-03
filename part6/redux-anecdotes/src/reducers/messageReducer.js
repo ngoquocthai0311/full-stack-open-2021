@@ -2,6 +2,8 @@ const actionType = {
     set: 'SET_MESSAGE',
     remove: 'REMOVE_MESSAGE'
 }
+// hold reference of setTimeOut callback 
+let TIME_OUT_ID
 
 const messageReducer = (state = '', action) => {
     switch(action.type) {
@@ -29,8 +31,9 @@ const removeMessage = () => {
 
 export const setNotification = (message, time) => {
     return async dispatch => {
+        clearTimeout(TIME_OUT_ID)
         dispatch(setMessage(message))
-        setTimeout(() => {
+        TIME_OUT_ID = setTimeout(() => {
             dispatch(removeMessage())
         }, time)
     }

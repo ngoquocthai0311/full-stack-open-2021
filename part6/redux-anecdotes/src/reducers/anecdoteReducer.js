@@ -28,7 +28,6 @@ const anecdoteReducer = (state = [], action) => {
 export const increaseVote = (anecdote) => {
     return async dispatch => { 
         const updatedAnecdote = { ...anecdote, votes: anecdote.votes + 1 }
-        console.log("checkign ne: ", updatedAnecdote)
         const response = await anecdotesService.increaseVote(updatedAnecdote)
         dispatch({
             type: actionType.vote,
