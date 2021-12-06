@@ -24,8 +24,15 @@ const App = () => {
       id: '2'
     }
   ])
-
   const [notification, setNotification] = useState('')
+  const TIMEOUT = 10000
+
+  const setTimoutForNotification = (message) => {
+    setNotification(message)
+    setTimeout(() => {
+      setNotification('')
+    }, TIMEOUT)
+  }
 
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
@@ -47,18 +54,21 @@ const App = () => {
   }
 
   const match = useRouteMatch('/anecdote/:id')
-  const anecdote = match ? anecdoteById(match.params.id)  : null
+  const anecdote = match ? anecdoteById(match.params.id)  : null  
+
+  
 
   return (
     <div>
       <h1>Software anecdotes</h1>     
       <Menu />
+      { notification }
       <Switch> 
         <Route path='/anecdote/:id'>
           <Anecdote anecdote={anecdote}/>
         </Route>
         <Route path='/create'>
-          <AnecdoteForm addNew={addNew} />  
+          <AnecdoteForm addNew={addNew} setNotification={setTimoutForNotification}/>  
         </Route>
         <Route path='/about'>
           <About />

@@ -1,11 +1,12 @@
 import React from "react"
 import { useState } from "react"
+import { useHistory } from "react-router-dom"
 
 const AnecdoteForm = (props) => {
     const [content, setContent] = useState('')
     const [author, setAuthor] = useState('')
     const [info, setInfo] = useState('')
-  
+    const history = useHistory()    
   
     const handleSubmit = (e) => {
       e.preventDefault()
@@ -14,7 +15,9 @@ const AnecdoteForm = (props) => {
         author,
         info,
         votes: 0
-      })
+      })      
+      props.setNotification(`a new anecdote ${content} created`)
+      history.push('/')
     }
   
     return (
