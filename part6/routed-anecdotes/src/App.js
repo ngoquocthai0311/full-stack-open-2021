@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { useRouteMatch, Switch, Route } from 'react-router-dom'
 import Menu from './components/Menu'
 import AnecdoteForm from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList'
 import About from './components/About'
 import Footer from './components/Footer'
+import Anecdote from './components/Anecdote'
 
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
@@ -45,26 +46,30 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  const match = useRouteMatch('/anecdote/:id')
+  const anecdote = match ? anecdoteById(match.params.id)  : null
+
   return (
     <div>
-      <h1>Software anecdotes</h1>
-      <Router>
-        <Menu />
-        <Switch> 
-          <Route path='/create'>
-            <AnecdoteForm addNew={addNew} />  
-          </Route>
-          <Route path='/about'>
-            <About />
-          </Route>
-          <Route path='/'>
-            <AnecdoteList anecdotes={anecdotes} />
-          </Route>                              
-        </Switch>                
-      </Router>
+      <h1>Software anecdotes</h1>     
+      <Menu />
+      <Switch> 
+        <Route path='/anecdote/:id'>
+          <Anecdote anecdote={anecdote}/>
+        </Route>
+        <Route path='/create'>
+          <AnecdoteForm addNew={addNew} />  
+        </Route>
+        <Route path='/about'>
+          <About />
+        </Route>
+        <Route path='/'>
+          <AnecdoteList anecdotes={anecdotes} />
+        </Route>                              
+      </Switch>                      
       <Footer />
     </div>
   )
 }
 
-export default App;
+export default App
