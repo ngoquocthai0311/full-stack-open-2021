@@ -3,10 +3,7 @@ import { useState } from "react"
 import { useHistory } from "react-router-dom"
 import { useField } from "../hooks"
 
-const AnecdoteForm = (props) => {
-    // const [content, setContent] = useState('')
-    // const [author, setAuthor] = useState('')
-    // const [info, setInfo] = useState('')
+const AnecdoteForm = (props) => {    
     const content = useField('text')
     const author = useField('text')
     const info = useField('text')
@@ -23,7 +20,12 @@ const AnecdoteForm = (props) => {
       props.setNotification(`a new anecdote ${content.value} created`)
       history.push('/')
     }
-  
+    
+    const handleOnClick = () => {
+      content.reset()
+      author.reset()
+      info.reset()
+    }
     return (
       <div>
         <h2>create a new anecdote</h2>
@@ -40,8 +42,9 @@ const AnecdoteForm = (props) => {
             url for more info            
             <input name='info' {...info} />
           </div>
-          <button>create</button>
-        </form>
+          <button type='submit'>create</button>                   
+          <button type='button' onClick={handleOnClick}>reset</button>
+        </form>        
       </div>
     )
   
