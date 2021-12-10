@@ -1,5 +1,4 @@
 import React from "react"
-import { useState } from "react"
 import { useHistory } from "react-router-dom"
 import { useField } from "../hooks"
 
@@ -7,7 +6,8 @@ const AnecdoteForm = (props) => {
     const content = useField('text')
     const author = useField('text')
     const info = useField('text')
-    const history = useHistory()        
+    const history = useHistory()     
+    
   
     const handleSubmit = (e) => {
       e.preventDefault()
@@ -26,21 +26,30 @@ const AnecdoteForm = (props) => {
       author.reset()
       info.reset()
     }
+
+    const _omitResetUseField = (object) => {
+      if (!object.reset) {
+        return null
+      }
+      const {reset, ...omitResetContentObj } = object
+      return omitResetContentObj
+    }
+
     return (
       <div>
         <h2>create a new anecdote</h2>
         <form onSubmit={handleSubmit}>
           <div>
             content           
-            <input name='content' {...content} /> 
+            <input name='content' {..._omitResetUseField(content)} /> 
           </div>
           <div>
             author          
-            <input name='author' {...author} />
+            <input name='author' {..._omitResetUseField(author)} />
           </div>
           <div>
             url for more info            
-            <input name='info' {...info} />
+            <input name='info' {..._omitResetUseField(info)} />
           </div>
           <button type='submit'>create</button>                   
           <button type='button' onClick={handleOnClick}>reset</button>
