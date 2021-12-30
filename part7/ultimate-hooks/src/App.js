@@ -1,39 +1,8 @@
   
 import React, { useState, useEffect } from 'react'
+import { useResource, useField } from './hooks'
 import axios from 'axios'
 
-
-const useField = (type) => {
-  const [value, setValue] = useState('')
-
-  const onChange = (event) => {
-    setValue(event.target.value)
-  }
-
-  return {
-    type,
-    value,
-    onChange
-  }
-}
-
-const useResource = (baseUrl) => {
-  const [resources, setResources] = useState([])
-
-  // ...
-
-  const create = (resource) => {
-    // ...
-  }
-
-  const service = {
-    create
-  }
-
-  return [
-    resources, service
-  ]
-}
 
 const App = () => {
   const content = useField('text')
@@ -50,7 +19,7 @@ const App = () => {
  
   const handlePersonSubmit = (event) => {
     event.preventDefault()
-    personService.create({ name: name.value, number: number.value})
+    personService.create({ name: name.value, number: number.value})    
   }
 
   return (
@@ -60,7 +29,7 @@ const App = () => {
         <input {...content} />
         <button>create</button>
       </form>
-      {notes.map(n => <p key={n.id}>{n.content}</p>)}
+      { notes.length !== 0 ? notes.map(n => <p key={n.id}>{n.content}</p>) : '' }      
 
       <h2>persons</h2>
       <form onSubmit={handlePersonSubmit}>
@@ -68,7 +37,7 @@ const App = () => {
         number <input {...number} />
         <button>create</button>
       </form>
-      {persons.map(n => <p key={n.id}>{n.name} {n.number}</p>)}
+      { persons.length !== 0 ? persons.map(n => <p key={n.id}>{n.name} {n.number}</p>) : '' }
     </div>
   )
 }
