@@ -9,7 +9,7 @@ describe('<BlogForm />', () => {
     const mockNotify = jest.fn()
     beforeEach(() => {
         blogFormComponent = render(
-            <BlogForm addBlog={mockAddBlog} notify={mockNotify}/>
+            <BlogForm addBlog={mockAddBlog} notify={mockNotify} />
         )
     })
     test('updates parent state and call onSubmit', () => {
@@ -19,13 +19,13 @@ describe('<BlogForm />', () => {
         const form = blogFormComponent.container.querySelector('form')
 
         fireEvent.change(title, {
-            target: { value: 'title' }
+            target: { value: 'title' },
         })
         fireEvent.change(author, {
-            target: { value: 'author' }
+            target: { value: 'author' },
         })
         fireEvent.change(url, {
-            target: { value: 'url' }
+            target: { value: 'url' },
         })
 
         fireEvent.submit(form)

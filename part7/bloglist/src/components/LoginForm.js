@@ -21,16 +21,16 @@ const LoginForm = React.forwardRef((props, ref) => {
 
     useImperativeHandle(ref, () => {
         return {
-            clearInputFields, saveToken
+            clearInputFields,
+            saveToken,
         }
     })
-
 
     const handleLogin = async (event) => {
         event.preventDefault()
         const credentials = {
             username,
-            password
+            password,
         }
         await props.login(credentials)
     }
@@ -38,9 +38,25 @@ const LoginForm = React.forwardRef((props, ref) => {
     return (
         <div>
             <form onSubmit={handleLogin}>
-                username <input id='username' type='text' name='username' value={username} onChange={({ target }) => setUsername(target.value)}/> <br />
-                password <input id='password' type='password' name='password' value={password} onChange={({ target }) => setPassword(target.value)}/> <br />
-                <button type='submit'>Log in</button>
+                username{' '}
+                <input
+                    id="username"
+                    type="text"
+                    name="username"
+                    value={username}
+                    onChange={({ target }) => setUsername(target.value)}
+                />{' '}
+                <br />
+                password{' '}
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={password}
+                    onChange={({ target }) => setPassword(target.value)}
+                />{' '}
+                <br />
+                <button type="submit">Log in</button>
             </form>
         </div>
     )
@@ -49,7 +65,7 @@ const LoginForm = React.forwardRef((props, ref) => {
 LoginForm.displayName = 'LoginForm'
 
 LoginForm.propTypes = {
-    login: PropTypes.func.isRequired
+    login: PropTypes.func.isRequired,
 }
 
 export default LoginForm

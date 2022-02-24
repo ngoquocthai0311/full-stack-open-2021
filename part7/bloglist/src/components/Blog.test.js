@@ -13,16 +13,22 @@ describe('<Blog />', () => {
             author: 'author',
             title: 'title',
             likes: 0,
-            url: 'url'
+            url: 'url',
         }
         component = render(
-            <Blog blog={blogObject} updateBlog={mockUpdateBlog} deleteBlog={mockDeleteBlog}/>
+            <Blog
+                blog={blogObject}
+                updateBlog={mockUpdateBlog}
+                deleteBlog={mockDeleteBlog}
+            />
         )
     })
     test('renders title and author by default', () => {
         const shortBlogDiv = component.container.querySelector('.short-blog')
         const longBlogDiv = component.container.querySelector('.long-blog')
-        expect(shortBlogDiv).toHaveTextContent(`${blogObject.title} ${blogObject.author}`)
+        expect(shortBlogDiv).toHaveTextContent(
+            `${blogObject.title} ${blogObject.author}`
+        )
         expect(longBlogDiv).toHaveStyle({ display: 'none' })
     })
     test('renders the rest of info by clicking view button', () => {
@@ -32,7 +38,9 @@ describe('<Blog />', () => {
         fireEvent.click(viewButton)
 
         expect(shortBlogDiv).toHaveStyle('display: none')
-        expect(longBlogDiv).toHaveTextContent(`${blogObject.url} ${blogObject.likes}`)
+        expect(longBlogDiv).toHaveTextContent(
+            `${blogObject.url} ${blogObject.likes}`
+        )
     })
     test('renders twice when clicking the like button twice', () => {
         const likeButton = component.getByText('like')

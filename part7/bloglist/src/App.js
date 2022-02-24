@@ -16,7 +16,8 @@ const App = () => {
 
     useEffect(() => {
         if (user === null) {
-            const loggedUserJson = window.localStorage.getItem('loggedBlogListUser')
+            const loggedUserJson =
+                window.localStorage.getItem('loggedBlogListUser')
             if (loggedUserJson) {
                 const loggedUser = JSON.parse(loggedUserJson)
 
@@ -45,11 +46,13 @@ const App = () => {
     }, [user])
 
     const sortBlogList = (unsortedBlogList) => {
-        return unsortedBlogList.sort((item1, item2) => item2.likes - item1.likes)
+        return unsortedBlogList.sort(
+            (item1, item2) => item2.likes - item1.likes
+        )
     }
 
     const filterOutBlog = (blogId) => {
-        const updatedBlogs = blogs.filter(blog => blog.id !== blogId)
+        const updatedBlogs = blogs.filter((blog) => blog.id !== blogId)
         setBlogs(updatedBlogs)
     }
 
@@ -78,9 +81,13 @@ const App = () => {
                 notifyWith('the blog is no longer exist', 'error')
                 filterOutBlog(id)
             } else {
-                notifyWith(`The blog ${data.title} by ${data.author} updated likes to ${data.likes}`)
+                notifyWith(
+                    `The blog ${data.title} by ${data.author} updated likes to ${data.likes}`
+                )
                 // sort the blogs after having been updated one blog
-                const sortedBlogList = sortBlogList(blogs.map(blog => blog.id === data.id ? data : blog))
+                const sortedBlogList = sortBlogList(
+                    blogs.map((blog) => (blog.id === data.id ? data : blog))
+                )
                 setBlogs(sortedBlogList)
             }
         } catch (error) {
@@ -131,8 +138,8 @@ const App = () => {
     const loginForm = () => (
         <>
             <h2>Login to application</h2>
-            <Notification notification={notificaiton}/>
-            <LoginForm login={handleLogin} ref={loginFormRef}/>
+            <Notification notification={notificaiton} />
+            <LoginForm login={handleLogin} ref={loginFormRef} />
         </>
     )
 
@@ -140,17 +147,31 @@ const App = () => {
         <div>
             <h2>blogs</h2>
 
-            <Notification notification={notificaiton}/>
+            <Notification notification={notificaiton} />
 
-            <p>{user.name} logged in <button onClick={() => {handleLogout()}}>log out</button></p>
+            <p>
+                {user.name} logged in{' '}
+                <button
+                    onClick={() => {
+                        handleLogout()
+                    }}
+                >
+                    log out
+                </button>
+            </p>
 
-            <Togglable buttonLabel='create new blog'>
+            <Togglable buttonLabel="create new blog">
                 <BlogForm notify={notifyWith} addBlog={handleAddBlog} />
             </Togglable>
 
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} updateBlog={handleUpdateBlog} deleteBlog={handleDeleteBlog}/>
-            )}
+            {blogs.map((blog) => (
+                <Blog
+                    key={blog.id}
+                    blog={blog}
+                    updateBlog={handleUpdateBlog}
+                    deleteBlog={handleDeleteBlog}
+                />
+            ))}
         </div>
     )
 

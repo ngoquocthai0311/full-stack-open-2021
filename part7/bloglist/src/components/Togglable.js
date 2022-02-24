@@ -5,12 +5,12 @@ const Togglable = (props) => {
     const [visibility, setVisibility] = useState(false)
 
     const showWhenVisible = { display: visibility ? '' : 'none' }
-    const hideWhenVisible = { display: visibility ? 'none': '' }
+    const hideWhenVisible = { display: visibility ? 'none' : '' }
 
     const toggleVisibility = () => {
         setVisibility(!visibility)
     }
-    return(
+    return (
         <div>
             <div style={hideWhenVisible}>
                 <button onClick={toggleVisibility}>{props.buttonLabel}</button>
@@ -24,7 +24,7 @@ const Togglable = (props) => {
 }
 
 Togglable.propTypes = {
-    buttonLabel: PropTypes.string.isRequired
+    buttonLabel: PropTypes.string.isRequired,
 }
 
 export default Togglable

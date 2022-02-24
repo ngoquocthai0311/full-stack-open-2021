@@ -20,7 +20,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
             likes: blog.likes + 1,
             author: blog.author,
             title: blog.title,
-            url: blog.url
+            url: blog.url,
         }
         await updateBlog(blog.id, requestBody)
     }
@@ -28,27 +28,31 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     const inlineStyle = {
         border: '2px solid black',
         padding: '10px 0px 0px 0px',
-        margin: '0px 0px 10px 0px'
+        margin: '0px 0px 10px 0px',
     }
     return (
-        <div style={inlineStyle} className='blog'>
-            <div style={hideWhenVisibile} className='short-blog'>
-                {blog.title} {blog.author} <button onClick={toggleVisibility}>view</button>
+        <div style={inlineStyle} className="blog">
+            <div style={hideWhenVisibile} className="short-blog">
+                {blog.title} {blog.author}{' '}
+                <button onClick={toggleVisibility}>view</button>
             </div>
-            <div style={showWhenVisible} className='long-blog'>
-                {blog.title} <button onClick={toggleVisibility}>hide</button> <br />
+            <div style={showWhenVisible} className="long-blog">
+                {blog.title} <button onClick={toggleVisibility}>hide</button>{' '}
+                <br />
                 {blog.url} <br />
-                {blog.likes} <button onClick={handleLikeIncrement}>like</button> <br />
+                {blog.likes} <button onClick={handleLikeIncrement}>like</button>{' '}
+                <br />
                 {blog.author} <br />
                 <button onClick={handleRemoveBlog}>remove</button>
             </div>
         </div>
-    )}
+    )
+}
 
 Blog.propTypes = {
     blog: PropTypes.object.isRequired,
     updateBlog: PropTypes.func.isRequired,
-    deleteBlog: PropTypes.func.isRequired
+    deleteBlog: PropTypes.func.isRequired,
 }
 
 export default Blog

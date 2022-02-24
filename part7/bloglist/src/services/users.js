@@ -7,7 +7,7 @@ const getUserId = async (username) => {
 }
 
 const exportee = {
-    getUserId
+    getUserId,
 }
 
 export default exportee

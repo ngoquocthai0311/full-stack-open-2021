@@ -7,7 +7,7 @@ const login = async (credentials) => {
 }
 
 const exportee = {
-    login
+    login,
 }
 
 export default exportee
